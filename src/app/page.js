@@ -3,6 +3,7 @@
 import Header from '@/components/layout/Header';
 import ProductCard from '@/components/ProductCard';
 import CategoryCard from '@/components/CategoryCard';
+import FloatingCart from '@/components/FloatingCart';
 import { Button } from '@/components/ui/button';
 import { products, getFeaturedProducts } from '@/data/products';
 import { getFeaturedCategories } from '@/data/categories';
@@ -19,6 +20,27 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 text-white overflow-hidden">
         <div className="absolute inset-0 bg-black/20" />
+        
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <motion.div
+            className="absolute top-1/4 left-1/4 w-64 h-64 bg-white/5 rounded-full"
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.1, 0.2, 0.1]
+            }}
+            transition={{ duration: 4, repeat: Infinity }}
+          />
+          <motion.div
+            className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-white/5 rounded-full"
+            animate={{
+              scale: [1.2, 1, 1.2],
+              opacity: [0.2, 0.1, 0.2]
+            }}
+            transition={{ duration: 3, repeat: Infinity }}
+          />
+        </div>
+
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="max-w-3xl">
             <motion.h1 
@@ -27,7 +49,16 @@ export default function HomePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              Smart Shopping with AI-Powered Pricing
+              Smart Shopping with{' '}
+              <motion.span
+                className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent"
+                animate={{ 
+                  backgroundPosition: ['0% 50%', '100% 50%', '0% 50%']
+                }}
+                transition={{ duration: 3, repeat: Infinity }}
+              >
+                AI-Powered Pricing
+              </motion.span>
             </motion.h1>
             <motion.p 
               className="text-xl md:text-2xl mb-8 text-blue-100"
@@ -53,10 +84,13 @@ export default function HomePage() {
           </div>
         </div>
         
-        {/* Floating Elements */}
+        {/* Enhanced Floating Elements */}
         <div className="absolute top-20 right-20 hidden lg:block">
           <motion.div
-            animate={{ y: [0, -10, 0] }}
+            animate={{ 
+              y: [0, -20, 0],
+              rotate: [0, 5, 0]
+            }}
             transition={{ duration: 3, repeat: Infinity }}
             className="text-6xl opacity-20"
           >
@@ -65,11 +99,26 @@ export default function HomePage() {
         </div>
         <div className="absolute bottom-20 right-40 hidden lg:block">
           <motion.div
-            animate={{ y: [0, 10, 0] }}
+            animate={{ 
+              y: [0, 15, 0],
+              rotate: [0, -5, 0]
+            }}
             transition={{ duration: 4, repeat: Infinity }}
             className="text-4xl opacity-20"
           >
             🥬
+          </motion.div>
+        </div>
+        <div className="absolute top-1/2 left-20 hidden lg:block">
+          <motion.div
+            animate={{ 
+              scale: [1, 1.1, 1],
+              rotate: [0, 10, 0]
+            }}
+            transition={{ duration: 5, repeat: Infinity }}
+            className="text-3xl opacity-20"
+          >
+            💰
           </motion.div>
         </div>
       </section>
@@ -196,6 +245,9 @@ export default function HomePage() {
           </p>
         </div>
       </footer>
+
+      {/* Floating Cart */}
+      <FloatingCart />
     </div>
   );
 }

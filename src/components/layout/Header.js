@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import SearchBar from '@/components/SearchBar';
 import { getUserSegment, isAuthenticated, getCurrentUser, login, logout } from '@/lib/auth';
 import { useState, useEffect } from 'react';
 import * as motion from 'motion/react-client';
@@ -37,34 +38,39 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
+          <Link href="/" className="flex items-center space-x-2 flex-shrink-0">
             <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">S</span>
             </div>
             <span className="text-xl font-bold text-gray-900">SmartStore</span>
           </Link>
 
+          {/* Search Bar - Desktop */}
+          <div className="hidden md:flex flex-1 max-w-lg mx-8">
+            <SearchBar />
+          </div>
+
           {/* Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <Link href="/" className="text-gray-700 hover:text-blue-600 transition-colors">
+          <nav className="hidden lg:flex items-center space-x-6">
+            <Link href="/" className="text-gray-700 hover:text-blue-600 transition-colors text-sm">
               Home
             </Link>
-            <Link href="/category/produce" className="text-gray-700 hover:text-blue-600 transition-colors">
-              Fresh Produce
+            <Link href="/category/produce" className="text-gray-700 hover:text-blue-600 transition-colors text-sm">
+              Produce
             </Link>
-            <Link href="/category/dairy" className="text-gray-700 hover:text-blue-600 transition-colors">
+            <Link href="/category/dairy" className="text-gray-700 hover:text-blue-600 transition-colors text-sm">
               Dairy
             </Link>
-            <Link href="/category/meat" className="text-gray-700 hover:text-blue-600 transition-colors">
-              Meat & Seafood
+            <Link href="/category/meat" className="text-gray-700 hover:text-blue-600 transition-colors text-sm">
+              Meat
             </Link>
           </nav>
 
           {/* User Actions */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3 flex-shrink-0">
             {user ? (
               <div className="flex items-center space-x-3">
-                <div className="text-sm">
+                <div className="text-sm hidden sm:block">
                   <span className="text-gray-600">Hello, </span>
                   <span className="font-medium text-gray-900">{user.name}</span>
                   <div className="text-xs text-blue-600 font-medium">
@@ -88,15 +94,16 @@ export default function Header() {
                   variant="ghost" 
                   size="sm" 
                   onClick={() => handleQuickLogin('customer')}
+                  className="hidden sm:inline-flex"
                 >
-                  Customer Login
+                  Login
                 </Button>
                 <Button 
                   variant="outline" 
                   size="sm" 
                   onClick={() => handleQuickLogin('admin')}
                 >
-                  Admin Login
+                  Admin
                 </Button>
               </div>
             )}
@@ -104,11 +111,25 @@ export default function Header() {
             {/* Cart Icon */}
             <Button variant="ghost" size="sm" className="relative">
               🛒
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              <motion.span 
+                className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 0.3 }}
+              >
                 3
-              </span>
+              </motion.span>
+            </Button>
+
+            {/* Mobile Search Toggle */}
+            <Button variant="ghost" size="sm" className="md:hidden">
+              🔍
             </Button>
           </div>
+        </div>
+
+        {/* Mobile Search Bar */}
+        <div className="md:hidden pb-4">
+          <SearchBar />
         </div>
       </div>
     </motion.header>
