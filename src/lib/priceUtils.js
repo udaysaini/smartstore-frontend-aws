@@ -1,75 +1,109 @@
 import { getUserSegment as getAuthUserSegment } from '@/lib/auth';
 
-export const getPriceForUser = (product, userSegment = null) => {
-  const segment = userSegment || getAuthUserSegment();
-  return product.segmentPrices[segment] || product.segmentPrices.Standard;
+export const getPriceForUser = (product, userType) => {
+  if (userType === 'VIP') {
+    return product.prices.vip;
+  }
+  
+  // For regular users, return discounted price if available, otherwise regular price
+  return product.prices.discounted || product.prices.regular;
+};
+
+export const getGuestPrice = (product) => {
+  // Guests see discounted price if available, otherwise regular price
+  return product.prices.discounted || product.prices.regular;
 };
 
 export const calculateDiscount = (originalPrice, currentPrice) => {
-  const discount = ((originalPrice - currentPrice) / originalPrice) * 100;
-  return Math.round(discount);
-};
-
-export const getExpiryDiscountLabel = (expiryDate) => {
-  const now = new Date();
-  const expiry = new Date(expiryDate);
-  const daysUntilExpiry = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
-  
-  if (daysUntilExpiry <= 1) {
-    return "🔥 Flash Sale – Expiring Today";
-  } else if (daysUntilExpiry <= 3) {
-    return "🔥 Flash Sale – Expiring Soon";
-  } else if (daysUntilExpiry <= 7) {
-    return "⏳ Short Shelf Life";
-  }
-  return null;
-};
-
-export const getInventoryStatus = (inventory) => {
-  if (inventory <= 5) {
-    return { status: "low", label: "Only " + inventory + " left!", color: "text-red-600" };
-  } else if (inventory <= 15) {
-    return { status: "medium", label: "Limited stock", color: "text-orange-600" };
-  }
-  return { status: "good", label: "In stock", color: "text-green-600" };
+  if (!originalPrice || !currentPrice || originalPrice === currentPrice) return 0;
+  return Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
 };
 
 export const formatPrice = (price) => {
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat('en-CA', {
     style: 'currency',
-    currency: 'USD'
+    currency: 'CAD'
   }).format(price);
 };
 
 export const getBadges = (product) => {
   const badges = [];
   
-  const expiryLabel = getExpiryDiscountLabel(product.expiryDate);
-  if (expiryLabel) {
-    badges.push({ type: 'expiry', label: expiryLabel, color: 'bg-red-500' });
-  }
-  
-  if (product.isEligibleForTGTG) {
-    badges.push({ type: 'tgtg', label: '🌍 Too Good To Go', color: 'bg-green-500' });
-  }
-  
   if (product.isFlashSale) {
-    badges.push({ type: 'flash', label: '⚡ Flash Sale', color: 'bg-yellow-500' });
+    badges.push({
+      type: 'flash-sale',
+      label: '⚡ Flash Sale',
+      color: 'bg-red-500'
+    });
+  }
+  
+  if (product.isQuickSale) {
+    badges.push({
+      type: 'quick-sale',
+      label: '🚀 Quick Sale',
+      color: 'bg-orange-500'
+    });
+  }
+  
+  if (product.madeInCanada) {
+    badges.push({
+      type: 'made-in-canada',
+      label: '🍁 Made in Canada',
+      color: 'bg-red-600'
+    });
   }
   
   return badges;
 };
 
-export const getGuestPrice = (product) => {
-  // For guests, show Standard pricing with any applicable discounts
-  let price = product.segmentPrices.Standard;
+export const getInventoryStatus = (inventory) => {
+  if (inventory <= 5) {
+    return {
+      status: 'critical',
+      label: `Only ${inventory} left!`,
+      color: 'text-red-600'
+    };
+  } else if (inventory <= 15) {
+    return {
+      status: 'low',
+      label: `${inventory} in stock`,
+      color: 'text-orange-600'
+    };
+  } else {
+    return {
+      status: 'good',
+      label: `${inventory} in stock`,
+      color: 'text-green-600'
+    };
+  }
+};
+
+export const getPricingInfo = (product, userType) => {
+  const regularPrice = product.prices.regular;
+  const discountedPrice = product.prices.discounted;
+  const vipPrice = product.prices.vip;
   
-  // Apply discounts for expiring products for all users
-  const expiryLabel = getExpiryDiscountLabel(product.expiryDate);
-  if (expiryLabel && expiryLabel.includes('Flash Sale')) {
-    // Apply additional discount for expiring items
-    price = price * 0.9; // 10% additional discount
+  let currentPrice, originalPrice, discount;
+  
+  if (userType === 'VIP') {
+    currentPrice = vipPrice;
+    originalPrice = discountedPrice || regularPrice;
+  } else {
+    currentPrice = discountedPrice || regularPrice;
+    originalPrice = discountedPrice ? regularPrice : null;
   }
   
-  return price;
+  discount = originalPrice ? calculateDiscount(originalPrice, currentPrice) : 0;
+  
+  return {
+    currentPrice,
+    originalPrice,
+    discount,
+    showDiscount: discount > 0
+  };
+};
+
+export const hasDiscount = (product, userType) => {
+  const { discount } = getPricingInfo(product, userType);
+  return discount > 0;
 };

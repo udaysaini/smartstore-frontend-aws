@@ -4,8 +4,15 @@ export const mockUsers = {
     id: "user_001",
     email: "customer@smartstore.com",
     role: "customer",
-    segment: "Premium",
+    segment: "Regular",
     name: "John Customer"
+  },
+  vip: {
+    id: "user_002",
+    email: "vip@smartstore.com", 
+    role: "customer",
+    segment: "VIP",
+    name: "Sarah VIP"
   },
   admin: {
     id: "admin_001", 
@@ -63,5 +70,10 @@ export const isAuthenticated = () => {
 
 export const getUserSegment = () => {
   const user = getCurrentUser();
-  return user?.segment || 'Standard';
+  return user?.segment || 'Regular';
+};
+
+export const isVIPMember = () => {
+  const user = getCurrentUser();
+  return user?.segment === 'VIP';
 };

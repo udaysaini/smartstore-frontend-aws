@@ -16,7 +16,18 @@ export default function Header() {
   }, []);
 
   const handleQuickLogin = (type) => {
-    const email = type === 'admin' ? 'admin@smartstore.com' : 'customer@smartstore.com';
+    let email;
+    switch(type) {
+      case 'admin':
+        email = 'admin@smartstore.com';
+        break;
+      case 'vip':
+        email = 'vip@smartstore.com';
+        break;
+      default:
+        email = 'customer@smartstore.com';
+    }
+    
     const result = login(email, 'password');
     if (result.success) {
       setUser(result.user);
@@ -73,9 +84,11 @@ export default function Header() {
                 <div className="text-sm hidden sm:block">
                   <span className="text-gray-600">Hello, </span>
                   <span className="font-medium text-gray-900">{user.name}</span>
-                  <div className="text-xs text-blue-600 font-medium">
-                    {user.segment} Member
-                  </div>
+                  {user.segment === 'VIP' && (
+                    <div className="text-xs text-yellow-600 font-medium flex items-center gap-1">
+                      ⭐ VIP Member
+                    </div>
+                  )}
                 </div>
                 {user.role === 'admin' && (
                   <Link href="/admin">
@@ -97,6 +110,14 @@ export default function Header() {
                   className="hidden sm:inline-flex"
                 >
                   Login
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => handleQuickLogin('vip')}
+                  className="text-yellow-600 border-yellow-600 hover:bg-yellow-50"
+                >
+                  VIP Login
                 </Button>
                 <Button 
                   variant="outline" 

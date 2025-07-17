@@ -10,7 +10,8 @@ import {
   formatPrice, 
   getBadges,
   getInventoryStatus,
-  getGuestPrice
+  getGuestPrice,
+  getPricingInfo
 } from '@/lib/priceUtils';
 import { getCurrentUser } from '@/lib/auth';
 import * as motion from 'motion/react-client';
@@ -25,12 +26,9 @@ export default function ProductCard({ product, className = "" }) {
     setUser(getCurrentUser());
   }, []);
 
-  // Fix: Use consistent pricing based on user state
-  const currentPrice = user 
-    ? getPriceForUser(product, user.segment)
-    : getGuestPrice(product);
-  
-  const discount = calculateDiscount(product.originalPrice, currentPrice);
+  // Use new pricing structure
+  const userType = user?.segment || 'Regular';
+  const { currentPrice, originalPrice, discount, showDiscount } = getPricingInfo(product, userType);
   const badges = getBadges(product);
   const inventoryStatus = getInventoryStatus(product.inventory);
 
@@ -168,10 +166,10 @@ export default function ProductCard({ product, className = "" }) {
               >
                 {formatPrice(currentPrice)}
               </motion.span>
-              {discount > 0 && (
+              {showDiscount && (
                 <>
                   <span className="text-sm text-gray-500 line-through">
-                    {formatPrice(product.originalPrice)}
+                    {formatPrice(originalPrice)}
                   </span>
                   <motion.span 
                     className="text-sm font-medium text-green-600"
@@ -185,19 +183,23 @@ export default function ProductCard({ product, className = "" }) {
               )}
             </div>
 
-            {/* User Segment Pricing Info */}
+            {/* User Pricing Info */}
             {user ? (
               <motion.div 
-                className="text-xs text-blue-600 mb-2"
+                className="text-xs mb-2"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 }}
               >
-                Your {user.segment} price
+                {user.segment === 'VIP' ? (
+                  <span className="text-yellow-600 font-medium">⭐ Your VIP price</span>
+                ) : (
+                  <span className="text-blue-600">Your member price</span>
+                )}
               </motion.div>
             ) : (
               <div className="text-xs text-gray-500 mb-2">
-                Sign in for member pricing
+                Sign up for VIP pricing & exclusive deals
               </div>
             )}
 

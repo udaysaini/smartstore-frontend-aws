@@ -12,7 +12,8 @@ import {
   formatPrice, 
   getBadges,
   getInventoryStatus,
-  getGuestPrice
+  getGuestPrice,
+  getPricingInfo
 } from '@/lib/priceUtils';
 import { getCurrentUser } from '@/lib/auth';
 import * as motion from 'motion/react-client';
@@ -45,11 +46,8 @@ export default function ProductPage() {
     );
   }
 
-  const currentPrice = user 
-    ? getPriceForUser(product, user.segment)
-    : getGuestPrice(product);
-  
-  const discount = calculateDiscount(product.originalPrice, currentPrice);
+  const userType = user?.segment || 'Regular';
+  const { currentPrice, originalPrice, discount, showDiscount } = getPricingInfo(product, userType);
   const badges = getBadges(product);
   const inventoryStatus = getInventoryStatus(product.inventory);
 
@@ -118,10 +116,10 @@ export default function ProductPage() {
                 <span className="text-3xl font-bold text-gray-900">
                   {formatPrice(currentPrice)}
                 </span>
-                {discount > 0 && (
+                {showDiscount && (
                   <>
                     <span className="text-lg text-gray-500 line-through">
-                      {formatPrice(product.originalPrice)}
+                      {formatPrice(originalPrice)}
                     </span>
                     <span className="text-lg font-medium text-green-600">
                       {discount}% off
@@ -131,15 +129,51 @@ export default function ProductPage() {
               </div>
               
               {user ? (
-                <p className="text-sm text-blue-600">
-                  Your {user.segment} member price
+                <p className="text-sm">
+                  {user.segment === 'VIP' ? (
+                    <span className="text-yellow-600 font-medium">⭐ Your exclusive VIP price</span>
+                  ) : (
+                    <span className="text-blue-600">Your member price</span>
+                  )}
                 </p>
               ) : (
                 <p className="text-sm text-gray-500">
-                  Sign in for member pricing and additional discounts
+                  Join VIP for exclusive pricing and member benefits
                 </p>
               )}
             </div>
+
+            {/* Pricing Comparison Table */}
+            <Card>
+              <CardContent className="p-4">
+                <h3 className="font-semibold mb-3">Pricing Details</h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Regular Price</span>
+                    <span className="text-sm font-medium">{formatPrice(product.prices.regular)}</span>
+                  </div>
+                  {product.prices.discounted && (
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Sale Price</span>
+                      <span className="text-sm font-medium text-green-600">{formatPrice(product.prices.discounted)}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between border-t pt-2">
+                    <span className={`text-sm font-medium ${user?.segment === 'VIP' ? 'text-yellow-600' : 'text-gray-600'}`}>
+                      VIP Price {user?.segment === 'VIP' ? '(You!)' : ''}
+                    </span>
+                    <span className={`text-sm font-bold ${user?.segment === 'VIP' ? 'text-yellow-600' : 'text-gray-900'}`}>
+                      {formatPrice(product.prices.vip)}
+                    </span>
+                  </div>
+                </div>
+                {!user && (
+                  <div className="mt-3 p-2 bg-yellow-50 rounded text-center">
+                    <p className="text-xs text-yellow-800">Join VIP to save {calculateDiscount(product.prices.regular, product.prices.vip)}% on this item!</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
 
             {/* Segment Pricing Table */}
             {user && (
@@ -207,10 +241,16 @@ export default function ProductPage() {
                 <span className="text-sm text-gray-600">Category:</span>
                 <span className="text-sm font-medium capitalize">{product.category}</span>
               </div>
-              {product.isEligibleForTGTG && (
+              {product.madeInCanada && (
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Too Good To Go:</span>
-                  <span className="text-sm font-medium text-green-600">Eligible</span>
+                  <span className="text-sm text-gray-600">Origin:</span>
+                  <span className="text-sm font-medium text-red-600">🍁 Made in Canada</span>
+                </div>
+              )}
+              {product.isQuickSale && (
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Quick Sale:</span>
+                  <span className="text-sm font-medium text-orange-600">🚀 Limited Time</span>
                 </div>
               )}
             </div>

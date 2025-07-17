@@ -3,57 +3,68 @@ export const categories = [
     id: "produce",
     name: "Fresh Produce",
     slug: "produce",
-    image: "/images/categories/produce.jpg",
-    description: "Fresh fruits and vegetables",
     icon: "🥬",
-    featured: true
+    description: "Fresh fruits and vegetables",
+    image: "/images/categories/produce.jpg"
   },
   {
     id: "dairy", 
     name: "Dairy & Eggs",
     slug: "dairy",
-    image: "/images/categories/dairy.jpg",
-    description: "Milk, cheese, yogurt and eggs",
     icon: "🥛",
-    featured: true
+    description: "Milk, cheese, yogurt and eggs",
+    image: "/images/categories/dairy.jpg"
   },
   {
     id: "meat",
-    name: "Meat & Seafood", 
+    name: "Meat & Poultry", 
     slug: "meat",
-    image: "/images/categories/meat.jpg",
-    description: "Fresh meat and seafood",
     icon: "🥩",
-    featured: true
+    description: "Fresh meat and poultry",
+    image: "/images/categories/meat.jpg"
   },
   {
     id: "bakery",
     name: "Bakery",
     slug: "bakery", 
-    image: "/images/categories/bakery.jpg",
-    description: "Fresh bread and baked goods",
     icon: "🍞",
-    featured: true
+    description: "Fresh bread and baked goods",
+    image: "/images/categories/bakery.jpg"
   },
   {
-    id: "pantry",
-    name: "Pantry Staples",
-    slug: "pantry",
-    image: "/images/categories/pantry.jpg", 
-    description: "Canned goods, pasta, rice",
-    icon: "🥫",
-    featured: false
+    id: "seafood",
+    name: "Seafood",
+    slug: "seafood",
+    icon: "🐟",
+    description: "Fresh fish and seafood",
+    image: "/images/categories/seafood.jpg"
   },
   {
     id: "frozen",
     name: "Frozen Foods",
     slug: "frozen",
-    image: "/images/categories/frozen.jpg",
+    icon: "🧊",
     description: "Frozen meals and ingredients", 
-    icon: "❄️",
-    featured: false
+    image: "/images/categories/frozen.jpg"
+  },
+  {
+    id: "beverages",
+    name: "Beverages",
+    slug: "beverages",
+    icon: "🥤",
+    description: "Drinks and beverages",
+    image: "/images/categories/beverages.jpg"
+  },
+  {
+    id: "snacks",
+    name: "Snacks",
+    slug: "snacks",
+    icon: "🍿",
+    description: "Chips, crackers and snacks",
+    image: "/images/categories/snacks.jpg"
   }
 ];
 
-export const getFeaturedCategories = () => categories.filter(c => c.featured);
+export const getFeaturedCategories = () => categories.slice(0, 4);
+export const getCategoryById = (id) => categories.find(c => c.id === id);
 export const getCategoryBySlug = (slug) => categories.find(c => c.slug === slug);
