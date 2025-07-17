@@ -7,11 +7,13 @@ import FloatingCart from '@/components/FloatingCart';
 import { Button } from '@/components/ui/button';
 import { products, getFeaturedProducts } from '@/data/products';
 import { getFeaturedCategories } from '@/data/categories';
+import { STORE_CONFIG } from '@/lib/constants';
 import * as motion from 'motion/react-client';
 
 export default function HomePage() {
-  const featuredProducts = getFeaturedProducts();
+  const featuredProducts = getFeaturedProducts().slice(0, 4); // Only show 4 deals (1 row)
   const featuredCategories = getFeaturedCategories();
+  const allProductsPreview = products.slice(0, 8); // Only show 8 products (2 rows)
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -66,7 +68,7 @@ export default function HomePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              Dynamic discounts, personalized offers, and fresh deals that adapt to your preferences
+              {STORE_CONFIG.description}
             </motion.p>
             <motion.div 
               className="flex flex-col sm:flex-row gap-4"
@@ -123,7 +125,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Flash Sales & Deals */}
+      {/* Flash Sales & Deals - Only 1 Row */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -156,8 +158,12 @@ export default function HomePage() {
           </div>
 
           <div className="text-center mt-12">
-            <Button size="lg" variant="outline">
-              View All Deals
+            <Button 
+              size="lg" 
+              variant="outline"
+              onClick={() => window.location.href = '/products?filter=deals'}
+            >
+              View All Deals ({getFeaturedProducts().length} items)
             </Button>
           </div>
         </div>
@@ -197,7 +203,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* All Products */}
+      {/* All Products Preview - Only 2 Rows */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -208,15 +214,15 @@ export default function HomePage() {
             className="text-center mb-12"
           >
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              All Products
+              Our Products
             </h2>
             <p className="text-lg text-gray-600">
-              Browse our complete selection with personalized pricing
+              Browse our selection with personalized pricing
             </p>
           </motion.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {products.map((product, index) => (
+            {allProductsPreview.map((product, index) => (
               <motion.div
                 key={product.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -228,6 +234,16 @@ export default function HomePage() {
               </motion.div>
             ))}
           </div>
+
+          <div className="text-center mt-12">
+            <Button 
+              size="lg" 
+              variant="outline"
+              onClick={() => window.location.href = '/products'}
+            >
+              View All Products ({products.length} items)
+            </Button>
+          </div>
         </div>
       </section>
 
@@ -238,10 +254,10 @@ export default function HomePage() {
             <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">S</span>
             </div>
-            <span className="text-xl font-bold">SmartStore</span>
+            <span className="text-xl font-bold">{STORE_CONFIG.name}</span>
           </div>
           <p className="text-gray-400">
-            AI-powered grocery shopping with dynamic pricing and personalized experiences
+            {STORE_CONFIG.tagline}
           </p>
         </div>
       </footer>

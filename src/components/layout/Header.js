@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import SearchBar from '@/components/SearchBar';
 import { getUserSegment, isAuthenticated, getCurrentUser, login, logout } from '@/lib/auth';
+import { STORE_CONFIG } from '@/lib/constants';
 import { useState, useEffect } from 'react';
 import * as motion from 'motion/react-client';
 
@@ -53,7 +54,7 @@ export default function Header() {
             <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">S</span>
             </div>
-            <span className="text-xl font-bold text-gray-900">SmartStore</span>
+            <span className="text-xl font-bold text-gray-900">{STORE_CONFIG.name}</span>
           </Link>
 
           {/* Search Bar - Desktop */}
@@ -66,14 +67,14 @@ export default function Header() {
             <Link href="/" className="text-gray-700 hover:text-blue-600 transition-colors text-sm">
               Home
             </Link>
+            <Link href="/products" className="text-gray-700 hover:text-blue-600 transition-colors text-sm">
+              Products
+            </Link>
+            <Link href="/products?filter=deals" className="text-gray-700 hover:text-blue-600 transition-colors text-sm">
+              Deals
+            </Link>
             <Link href="/category/produce" className="text-gray-700 hover:text-blue-600 transition-colors text-sm">
               Produce
-            </Link>
-            <Link href="/category/dairy" className="text-gray-700 hover:text-blue-600 transition-colors text-sm">
-              Dairy
-            </Link>
-            <Link href="/category/meat" className="text-gray-700 hover:text-blue-600 transition-colors text-sm">
-              Meat
             </Link>
           </nav>
 

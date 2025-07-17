@@ -1,4 +1,5 @@
 import { Geist, Geist_Mono } from "next/font/google";
+import { STORE_CONFIG } from "@/lib/constants";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -12,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "SmartStore - AI-Powered Grocery Shopping",
-  description: "Dynamic pricing and personalized shopping experience powered by AI",
+  title: `${STORE_CONFIG.name} - AI-Powered Grocery Shopping`,
+  description: STORE_CONFIG.tagline,
 };
 
 export default function RootLayout({ children }) {

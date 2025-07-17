@@ -175,27 +175,6 @@ export default function ProductPage() {
               </CardContent>
             </Card>
 
-            {/* Segment Pricing Table */}
-            {user && (
-              <Card>
-                <CardContent className="p-4">
-                  <h3 className="font-semibold mb-3">Member Pricing</h3>
-                  <div className="space-y-2">
-                    {Object.entries(product.segmentPrices).map(([segment, price]) => (
-                      <div key={segment} className="flex justify-between">
-                        <span className={`text-sm ${user.segment === segment ? 'font-bold text-blue-600' : 'text-gray-600'}`}>
-                          {segment} {user.segment === segment ? '(You)' : ''}
-                        </span>
-                        <span className={`text-sm ${user.segment === segment ? 'font-bold text-blue-600' : 'text-gray-600'}`}>
-                          {formatPrice(price)}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
             {/* Inventory Status */}
             <div className={`text-sm ${inventoryStatus.color}`}>
               {inventoryStatus.label}

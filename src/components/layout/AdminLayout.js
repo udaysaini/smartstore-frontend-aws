@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { getCurrentUser, logout } from '@/lib/auth';
+import { STORE_CONFIG } from '@/lib/constants';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -54,7 +55,7 @@ export default function AdminLayout({ children }) {
                 <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-sm">S</span>
                 </div>
-                <span className="text-xl font-bold text-gray-900">SmartStore Admin</span>
+                <span className="text-xl font-bold text-gray-900">{STORE_CONFIG.name} Admin</span>
               </Link>
             </div>
             
