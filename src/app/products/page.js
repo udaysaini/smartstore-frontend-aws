@@ -7,11 +7,13 @@ import FloatingCart from '@/components/FloatingCart';
 import { Button } from '@/components/ui/button';
 import { products, getFeaturedProducts } from '@/data/products';
 import { STORE_CONFIG } from '@/lib/constants';
+import { useState } from 'react';
 import * as motion from 'motion/react-client';
 
 export default function ProductsPage() {
   const searchParams = useSearchParams();
   const filter = searchParams.get('filter'); // 'deals' or null for all products
+  const [userKey, setUserKey] = useState(0); // Key to force re-render of product cards
   
   const displayProducts = filter === 'deals' ? getFeaturedProducts() : products;
   const pageTitle = filter === 'deals' ? 'All Deals & Flash Sales' : 'All Products';
@@ -19,9 +21,13 @@ export default function ProductsPage() {
     ? 'Discover all our current deals, flash sales, and special offers'
     : 'Browse our complete selection with personalized pricing';
 
+  const handleUserChange = (user) => {
+    setUserKey(prev => prev + 1); // Force re-render of all product cards
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
+      <Header onUserChange={handleUserChange} />
       
       {/* Page Header */}
       <section className="bg-white border-b">
@@ -81,7 +87,7 @@ export default function ProductsPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {displayProducts.map((product, index) => (
                   <motion.div
-                    key={product.id}
+                    key={`${product.id}-${userKey}`} // Include userKey to force re-render
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: index * 0.05 }}

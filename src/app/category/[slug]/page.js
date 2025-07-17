@@ -6,19 +6,25 @@ import ProductCard from '@/components/ProductCard';
 import { Button } from '@/components/ui/button';
 import { getProductsByCategory } from '@/data/products';
 import { getCategoryBySlug } from '@/data/categories';
+import { useState } from 'react';
 import * as motion from 'motion/react-client';
 
 export default function CategoryPage() {
   const params = useParams();
   const slug = params.slug;
+  const [userKey, setUserKey] = useState(0); // Key to force re-render of product cards
   
   const category = getCategoryBySlug(slug);
   const products = getProductsByCategory(category?.id || '');
 
+  const handleUserChange = (user) => {
+    setUserKey(prev => prev + 1); // Force re-render of all product cards
+  };
+
   if (!category) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header />
+        <Header onUserChange={handleUserChange} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Category Not Found</h1>
           <p className="text-gray-600 mb-8">The category you&apos;re looking for doesn&apos;t exist.</p>
@@ -32,7 +38,7 @@ export default function CategoryPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
+      <Header onUserChange={handleUserChange} />
       
       {/* Category Header */}
       <section className="bg-white border-b">
@@ -76,7 +82,7 @@ export default function CategoryPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {products.map((product, index) => (
                   <motion.div
-                    key={product.id}
+                    key={`${product.id}-${userKey}`} // Include userKey to force re-render
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: index * 0.1 }}

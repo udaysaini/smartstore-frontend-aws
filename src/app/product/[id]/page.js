@@ -24,6 +24,7 @@ export default function ProductPage() {
   const id = params.id;
   const [user, setUser] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [priceKey, setPriceKey] = useState(0); // Key to trigger price animations
   
   const product = getProductById(id);
 
@@ -31,10 +32,15 @@ export default function ProductPage() {
     setUser(getCurrentUser());
   }, []);
 
+  const handleUserChange = (newUser) => {
+    setUser(newUser);
+    setPriceKey(prev => prev + 1); // Trigger price animation
+  };
+
   if (!product) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header />
+        <Header onUserChange={handleUserChange} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Product Not Found</h1>
           <p className="text-gray-600 mb-8">The product you&apos;re looking for doesn&apos;t exist.</p>
@@ -53,7 +59,7 @@ export default function ProductPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
+      <Header onUserChange={handleUserChange} />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <motion.div
@@ -110,32 +116,50 @@ export default function ProductPage() {
               </span>
             </div>
 
-            {/* Pricing */}
+            {/* Pricing with animations */}
             <div className="space-y-2">
               <div className="flex items-center gap-4">
-                <span className="text-3xl font-bold text-gray-900">
+                <motion.span 
+                  key={`${currentPrice}-${priceKey}`} // Include priceKey for animation trigger
+                  className="text-3xl font-bold text-gray-900"
+                  initial={{ scale: 1.2, color: '#22c55e' }}
+                  animate={{ scale: 1, color: '#111827' }}
+                  transition={{ duration: 0.5 }}
+                >
                   {formatPrice(currentPrice)}
-                </span>
+                </motion.span>
                 {showDiscount && (
                   <>
                     <span className="text-lg text-gray-500 line-through">
                       {formatPrice(originalPrice)}
                     </span>
-                    <span className="text-lg font-medium text-green-600">
+                    <motion.span 
+                      key={`discount-${priceKey}`}
+                      className="text-lg font-medium text-green-600"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 0.3, type: "spring", stiffness: 500 }}
+                    >
                       {discount}% off
-                    </span>
+                    </motion.span>
                   </>
                 )}
               </div>
               
               {user ? (
-                <p className="text-sm">
+                <motion.p 
+                  key={`user-info-${priceKey}`}
+                  className="text-sm"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                >
                   {user.segment === 'VIP' ? (
                     <span className="text-yellow-600 font-medium">⭐ Your exclusive VIP price</span>
                   ) : (
                     <span className="text-blue-600">Your member price</span>
                   )}
-                </p>
+                </motion.p>
               ) : (
                 <p className="text-sm text-gray-500">
                   Join VIP for exclusive pricing and member benefits
@@ -143,37 +167,56 @@ export default function ProductPage() {
               )}
             </div>
 
-            {/* Pricing Comparison Table */}
-            <Card>
-              <CardContent className="p-4">
-                <h3 className="font-semibold mb-3">Pricing Details</h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Regular Price</span>
-                    <span className="text-sm font-medium">{formatPrice(product.prices.regular)}</span>
-                  </div>
-                  {product.prices.discounted && (
+            {/* Pricing Comparison Table with animations */}
+            <motion.div
+              key={`pricing-table-${priceKey}`}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <Card>
+                <CardContent className="p-4">
+                  <h3 className="font-semibold mb-3">Pricing Details</h3>
+                  <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Sale Price</span>
-                      <span className="text-sm font-medium text-green-600">{formatPrice(product.prices.discounted)}</span>
+                      <span className="text-sm text-gray-600">Regular Price</span>
+                      <span className="text-sm font-medium">{formatPrice(product.prices.regular)}</span>
                     </div>
+                    {product.prices.discounted && (
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-600">Sale Price</span>
+                        <span className="text-sm font-medium text-green-600">{formatPrice(product.prices.discounted)}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between border-t pt-2">
+                      <span className={`text-sm font-medium ${user?.segment === 'VIP' ? 'text-yellow-600' : 'text-gray-600'}`}>
+                        VIP Price {user?.segment === 'VIP' ? '(You!)' : ''}
+                      </span>
+                      <motion.span 
+                        className={`text-sm font-bold ${user?.segment === 'VIP' ? 'text-yellow-600' : 'text-gray-900'}`}
+                        animate={user?.segment === 'VIP' ? {
+                          scale: [1, 1.1, 1],
+                          color: ['#d97706', '#f59e0b', '#d97706']
+                        } : {}}
+                        transition={{ duration: 1 }}
+                      >
+                        {formatPrice(product.prices.vip)}
+                      </motion.span>
+                    </div>
+                  </div>
+                  {!user && (
+                    <motion.div 
+                      className="mt-3 p-2 bg-yellow-50 rounded text-center"
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.6 }}
+                    >
+                      <p className="text-xs text-yellow-800">Join VIP to save {calculateDiscount(product.prices.regular, product.prices.vip)}% on this item!</p>
+                    </motion.div>
                   )}
-                  <div className="flex justify-between border-t pt-2">
-                    <span className={`text-sm font-medium ${user?.segment === 'VIP' ? 'text-yellow-600' : 'text-gray-600'}`}>
-                      VIP Price {user?.segment === 'VIP' ? '(You!)' : ''}
-                    </span>
-                    <span className={`text-sm font-bold ${user?.segment === 'VIP' ? 'text-yellow-600' : 'text-gray-900'}`}>
-                      {formatPrice(product.prices.vip)}
-                    </span>
-                  </div>
-                </div>
-                {!user && (
-                  <div className="mt-3 p-2 bg-yellow-50 rounded text-center">
-                    <p className="text-xs text-yellow-800">Join VIP to save {calculateDiscount(product.prices.regular, product.prices.vip)}% on this item!</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </motion.div>
 
             {/* Inventory Status */}
             <div className={`text-sm ${inventoryStatus.color}`}>
@@ -200,11 +243,18 @@ export default function ProductPage() {
               </div>
             </div>
 
-            {/* Add to Cart */}
+            {/* Add to Cart with animated total */}
             <div className="space-y-3">
-              <Button size="lg" className="w-full">
-                Add {quantity} to Cart - {formatPrice(currentPrice * quantity)}
-              </Button>
+              <motion.div
+                key={`cart-button-${priceKey}`}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7 }}
+              >
+                <Button size="lg" className="w-full">
+                  Add {quantity} to Cart - {formatPrice(currentPrice * quantity)}
+                </Button>
+              </motion.div>
               <Button size="lg" variant="outline" className="w-full">
                 Buy Now
               </Button>
