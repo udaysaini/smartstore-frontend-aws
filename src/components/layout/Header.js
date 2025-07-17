@@ -8,7 +8,7 @@ import { STORE_CONFIG } from '@/lib/constants';
 import { useState, useEffect } from 'react';
 import * as motion from 'motion/react-client';
 
-export default function Header() {
+export default function Header({ onUserChange = () => {} }) {
   const [user, setUser] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -32,12 +32,14 @@ export default function Header() {
     const result = login(email, 'password');
     if (result.success) {
       setUser(result.user);
+      onUserChange(result.user); // Notify parent components
     }
   };
 
   const handleLogout = () => {
     logout();
     setUser(null);
+    onUserChange(null); // Notify parent components
   };
 
   return (
@@ -62,90 +64,150 @@ export default function Header() {
             <SearchBar />
           </div>
 
-          {/* Navigation */}
-          <nav className="hidden lg:flex items-center space-x-6">
-            <Link href="/" className="text-gray-700 hover:text-blue-600 transition-colors text-sm">
+          {/* Navigation - Better spaced */}
+          <nav className="hidden lg:flex items-center space-x-8">
+            <Link href="/" className="text-gray-700 hover:text-blue-600 transition-colors font-medium">
               Home
             </Link>
-            <Link href="/products" className="text-gray-700 hover:text-blue-600 transition-colors text-sm">
+            <Link href="/products" className="text-gray-700 hover:text-blue-600 transition-colors font-medium">
               Products
             </Link>
-            <Link href="/products?filter=deals" className="text-gray-700 hover:text-blue-600 transition-colors text-sm">
-              Deals
+            <Link href="/products?filter=deals" className="text-red-600 hover:text-red-700 transition-colors font-medium flex items-center gap-1">
+              🔥 Deals
             </Link>
-            <Link href="/category/produce" className="text-gray-700 hover:text-blue-600 transition-colors text-sm">
-              Produce
-            </Link>
+            <div className="h-6 w-px bg-gray-300"></div> {/* Separator */}
           </nav>
 
-          {/* User Actions */}
-          <div className="flex items-center space-x-3 flex-shrink-0">
+          {/* User Actions - Improved spacing and layout */}
+          <div className="flex items-center space-x-4 flex-shrink-0">
             {user ? (
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-4">
+                {/* User Info */}
                 <div className="text-sm hidden sm:block">
-                  <span className="text-gray-600">Hello, </span>
-                  <span className="font-medium text-gray-900">{user.name}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-600">Hello,</span>
+                    <span className="font-semibold text-gray-900">{user.name}</span>
+                  </div>
                   {user.segment === 'VIP' && (
-                    <div className="text-xs text-yellow-600 font-medium flex items-center gap-1">
+                    <div className="text-xs text-amber-600 font-bold flex items-center gap-1 mt-0.5">
                       ⭐ VIP Member
                     </div>
                   )}
+                  {user.segment === 'Premium' && (
+                    <div className="text-xs text-purple-600 font-medium flex items-center gap-1 mt-0.5">
+                      💎 Premium
+                    </div>
+                  )}
+                  {user.segment === 'Standard' && (
+                    <div className="text-xs text-blue-600 font-medium flex items-center gap-1 mt-0.5">
+                      👤 Standard
+                    </div>
+                  )}
                 </div>
-                {user.role === 'admin' && (
-                  <Link href="/admin">
-                    <Button variant="outline" size="sm">
-                      Admin
-                    </Button>
-                  </Link>
-                )}
-                <Button variant="ghost" size="sm" onClick={handleLogout}>
-                  Logout
-                </Button>
+
+                {/* Action Buttons */}
+                <div className="flex items-center space-x-2">
+                  {user.role === 'admin' && (
+                    <Link href="/admin">
+                      <Button variant="outline" size="sm" className="border-green-600 text-green-600 hover:bg-green-50">
+                        Admin Panel
+                      </Button>
+                    </Link>
+                  )}
+                  <Button variant="ghost" size="sm" onClick={handleLogout} className="text-gray-600 hover:text-gray-900">
+                    Logout
+                  </Button>
+                </div>
               </div>
             ) : (
-              <div className="flex items-center space-x-2">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => handleQuickLogin('customer')}
-                  className="hidden sm:inline-flex"
-                >
-                  Login
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => handleQuickLogin('vip')}
-                  className="text-yellow-600 border-yellow-600 hover:bg-yellow-50"
-                >
-                  VIP Login
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => handleQuickLogin('admin')}
-                >
-                  Admin
-                </Button>
+              <div className="flex items-center space-x-3">
+                {/* Quick Login Options */}
+                <div className="hidden sm:flex items-center space-x-2">
+                  <span className="text-sm text-gray-500">Quick Login:</span>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => handleQuickLogin('customer')}
+                    className="text-blue-600 hover:bg-blue-50"
+                  >
+                    Customer
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => handleQuickLogin('vip')}
+                    className="text-amber-600 hover:bg-amber-50 font-medium"
+                  >
+                    ⭐ VIP
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => handleQuickLogin('admin')}
+                    className="text-green-600 hover:bg-green-50"
+                  >
+                    Admin
+                  </Button>
+                </div>
+
+                {/* Mobile Login Dropdown */}
+                <div className="sm:hidden relative">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  >
+                    Login ▾
+                  </Button>
+                  {isMenuOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="absolute right-0 mt-2 bg-white rounded-lg shadow-xl border py-2 min-w-[120px] z-50"
+                    >
+                      <button 
+                        onClick={() => { handleQuickLogin('customer'); setIsMenuOpen(false); }}
+                        className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
+                      >
+                        Customer
+                      </button>
+                      <button 
+                        onClick={() => { handleQuickLogin('vip'); setIsMenuOpen(false); }}
+                        className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50 text-amber-600"
+                      >
+                        ⭐ VIP
+                      </button>
+                      <button 
+                        onClick={() => { handleQuickLogin('admin'); setIsMenuOpen(false); }}
+                        className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50 text-green-600"
+                      >
+                        Admin
+                      </button>
+                    </motion.div>
+                  )}
+                </div>
               </div>
             )}
             
-            {/* Cart Icon */}
-            <Button variant="ghost" size="sm" className="relative">
-              🛒
-              <motion.span 
-                className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 0.3 }}
-              >
-                3
-              </motion.span>
-            </Button>
+            {/* Cart Icon - Better positioned */}
+            <div className="flex items-center space-x-2">
+              <div className="h-6 w-px bg-gray-300 hidden sm:block"></div> {/* Separator */}
+              <Button variant="ghost" size="sm" className="relative hover:bg-blue-50">
+                <span className="text-xl">🛒</span>
+                <motion.span 
+                  className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold"
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 0.3 }}
+                >
+                  3
+                </motion.span>
+              </Button>
 
-            {/* Mobile Search Toggle */}
-            <Button variant="ghost" size="sm" className="md:hidden">
-              🔍
-            </Button>
+              {/* Mobile Search Toggle */}
+              <Button variant="ghost" size="sm" className="md:hidden">
+                🔍
+              </Button>
+            </div>
           </div>
         </div>
 

@@ -8,16 +8,23 @@ import { Button } from '@/components/ui/button';
 import { products, getFeaturedProducts } from '@/data/products';
 import { getFeaturedCategories } from '@/data/categories';
 import { STORE_CONFIG } from '@/lib/constants';
+import { useState } from 'react';
 import * as motion from 'motion/react-client';
 
 export default function HomePage() {
+  const [userKey, setUserKey] = useState(0); // Key to force re-render of product cards
+  
   const featuredProducts = getFeaturedProducts().slice(0, 4); // Only show 4 deals (1 row)
   const featuredCategories = getFeaturedCategories();
   const allProductsPreview = products.slice(0, 8); // Only show 8 products (2 rows)
 
+  const handleUserChange = (user) => {
+    setUserKey(prev => prev + 1); // Force re-render of all product cards
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
+      <Header onUserChange={handleUserChange} />
       
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 text-white overflow-hidden">
@@ -146,7 +153,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {featuredProducts.map((product, index) => (
               <motion.div
-                key={product.id}
+                key={`${product.id}-${userKey}`} // Include userKey to force re-render
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
@@ -224,7 +231,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {allProductsPreview.map((product, index) => (
               <motion.div
-                key={product.id}
+                key={`${product.id}-${userKey}`} // Include userKey to force re-render
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: (index % 4) * 0.1 }}

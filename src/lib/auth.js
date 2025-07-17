@@ -4,7 +4,7 @@ export const mockUsers = {
     id: "user_001",
     email: "customer@smartstore.com",
     role: "customer",
-    segment: "Regular",
+    segment: "Standard",
     name: "John Customer"
   },
   vip: {
