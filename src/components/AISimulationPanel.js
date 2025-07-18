@@ -275,17 +275,6 @@ export default function AISimulationPanel({ onPriceUpdate }) {
               </div>
             </div>
 
-            {/* Demo Instructions */}
-            <div className="text-xs text-gray-600 bg-blue-50 p-2 rounded border border-blue-200">
-              <p className="font-medium mb-1">Demo Flow:</p>
-              <ol className="space-y-1">
-                <li>1. Show original prices</li>
-                <li>2. Demo AI agents in Bedrock</li>
-                <li>3. Use shortcuts or buttons</li>
-                <li>4. Show updated prices & reasons</li>
-              </ol>
-            </div>
-
             {/* AI Processing Indicator */}
             {isUpdating && (
               <motion.div
