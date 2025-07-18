@@ -15,11 +15,13 @@ import NotificationSystem from '@/components/NotificationSystem';
 import useNotifications from '@/hooks/useNotifications';
 
 export default function HomePage() {
-  const [userKey, setUserKey] = useState(0); // Key to force re-render of product cards
-  const [priceUpdateKey, setPriceUpdateKey] = useState(0); // Key for AI price updates
+  const [userKey, setUserKey] = useState(0);
+  const [priceUpdateKey, setPriceUpdateKey] = useState(0);
   const { notifications, addNotification, removeNotification } = useNotifications();
   
-  const featuredProducts = getFeaturedProducts().slice(0, 4); // Only show 4 deals (1 row)
+  // Get featured products and ensure we always have products to show
+  const featuredProducts = getFeaturedProducts();
+  const displayFeaturedProducts = featuredProducts.length > 0 ? featuredProducts.slice(0, 4) : products.slice(0, 4);
   const featuredCategories = getFeaturedCategories();
   const allProductsPreview = products.slice(0, 8); // Only show 8 products (2 rows)
 
@@ -183,9 +185,9 @@ export default function HomePage() {
           </motion.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProducts.map((product, index) => (
+            {displayFeaturedProducts.map((product, index) => (
               <motion.div
-                key={`${product.id}-${userKey}-${priceUpdateKey}`} // Include both keys for re-rendering
+                key={`${product.id}-${userKey}-${priceUpdateKey}`}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
@@ -202,7 +204,7 @@ export default function HomePage() {
               variant="outline"
               onClick={() => window.location.href = '/products?filter=deals'}
             >
-              View All Deals ({getFeaturedProducts().length} items)
+              View All Deals ({Math.max(getFeaturedProducts().length, 4)} items)
             </Button>
           </div>
         </div>

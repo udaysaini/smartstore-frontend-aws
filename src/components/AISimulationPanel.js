@@ -9,6 +9,7 @@ import {
   simulateFullAI, 
   simulateExpiryFocus,
   simulateRetailPriceAdjustment,
+  simulateExpiredItemsClearance,
   clearAIUpdates, 
   getAIAgentStatus, 
   getAIUpdatedProductsCount,
@@ -24,7 +25,9 @@ export default function AISimulationPanel({ onPriceUpdate, onNotification }) {
   const [updateCount, setUpdateCount] = useState(0);
   const [lastUpdateType, setLastUpdateType] = useState('');
   const [maxItems, setMaxItems] = useState(AI_CONFIG.MAX_ITEMS_TO_UPDATE);
-  const [retailDuration, setRetailDuration] = useState(AI_CONFIG.RETAIL_ADJUSTMENT_DURATION); // New duration setting
+  const [retailDuration, setRetailDuration] = useState(AI_CONFIG.RETAIL_ADJUSTMENT_DURATION);
+  const [clearanceDuration, setClearanceDuration] = useState(AI_CONFIG.CLEARANCE_DURATION); // New clearance duration
+  const [confettiIntensity, setConfettiIntensity] = useState(50); // New confetti control
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -105,6 +108,18 @@ export default function AISimulationPanel({ onPriceUpdate, onNotification }) {
         e.preventDefault();
         handleRetailAdjustment();
       }
+
+      // Ctrl+Alt+5: Expired Items Clearance
+      if (e.ctrlKey && e.altKey && (e.key === '5' || e.code === 'Digit5')) {
+        e.preventDefault();
+        handleExpiredItemsClearance();
+      }
+      
+      // F6: Expired Items Clearance
+      if (e.key === 'F6') {
+        e.preventDefault();
+        handleExpiredItemsClearance();
+      }
     };
     
     window.addEventListener('keydown', handleKeyPress);
@@ -152,11 +167,23 @@ export default function AISimulationPanel({ onPriceUpdate, onNotification }) {
     setIsUpdating(true);
     setLastUpdateType('Retail Price Adjustment');
     
+    // User-friendly loading messages
+    const loadingMessages = [
+      'Hunting for the best deals in town...',
+      'Checking competitor prices to save you money...',
+      'Finding you unbeatable prices...',
+      'Scanning the market for better deals...',
+      'Working hard to get you the lowest prices...',
+      'Searching for price drops and savings...'
+    ];
+    
+    const randomMessage = loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
+    
     // Show loading notification
     const loadingNotificationId = onNotification({
       type: 'info',
-      title: 'AI Competitive Analysis',
-      message: 'Scraping competitor websites and analyzing market prices...',
+      title: 'AI Price Hunt in Progress',
+      message: randomMessage,
       showLoader: true,
       duration: retailDuration,
       autoRemove: false
@@ -182,12 +209,97 @@ export default function AISimulationPanel({ onPriceUpdate, onNotification }) {
     
     setIsUpdating(false);
     
+    // Success messages
+    const successMessages = [
+      `Amazing! Found better prices for ${Object.keys(updates).length} products. You're saving big! 💰`,
+      `Jackpot! We got you better deals on ${Object.keys(updates).length} items. Your wallet will thank you! 🎉`,
+      `Success! Found price drops on ${Object.keys(updates).length} products. Shopping just got cheaper! ✨`,
+      `Boom! ${Object.keys(updates).length} items now have better prices. You're getting the best deals in town! 🔥`
+    ];
+    
+    const randomSuccessMessage = successMessages[Math.floor(Math.random() * successMessages.length)];
+    
     // Show success notification with confetti
     onNotification({
       type: 'success',
-      title: 'Prices Updated! 🎉',
-      message: `Found better prices for ${Object.keys(updates).length} products. You're now getting the best deals in town!`,
+      title: 'Price Drop Alert! 🎉',
+      message: randomSuccessMessage,
       showConfetti: true,
+      confettiIntensity: confettiIntensity,
+      duration: 6000
+    });
+    
+    // Notify parent components to re-render
+    if (onPriceUpdate) {
+      onPriceUpdate();
+    }
+  };
+
+  const handleExpiredItemsClearance = async () => {
+    if (isUpdating) return;
+    
+    setIsUpdating(true);
+    setLastUpdateType('Expired Items Clearance');
+    
+    // User-friendly clearance messages
+    const loadingMessages = [
+      'Scanning for expired and slow-moving items...',
+      'Identifying clearance opportunities to reduce waste...',
+      'Finding items that need immediate price reductions...',
+      'Analyzing inventory for urgent clearance pricing...',
+      'Detecting products requiring quick movement...',
+      'Optimizing prices to prevent food waste...'
+    ];
+    
+    const randomMessage = loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
+    
+    // Show loading notification
+    const loadingNotificationId = onNotification({
+      type: 'warning',
+      title: 'AI Clearance Analysis',
+      message: randomMessage,
+      showLoader: true,
+      duration: clearanceDuration,
+      autoRemove: false
+    });
+
+    // Update configuration
+    updateAIConfig({ 
+      MAX_ITEMS_TO_UPDATE: maxItems,
+      CLEARANCE_DURATION: clearanceDuration 
+    });
+    
+    // Wait for the specified duration
+    await new Promise(resolve => setTimeout(resolve, clearanceDuration));
+    
+    // Remove loading notification
+    if (onNotification.remove) {
+      onNotification.remove(loadingNotificationId);
+    }
+    
+    // Execute the clearance
+    const updates = simulateExpiredItemsClearance(products, maxItems);
+    setUpdateCount(Object.keys(updates).length);
+    
+    setIsUpdating(false);
+    
+    // Success messages for clearance
+    const successMessages = [
+      `Clearance activated! ${Object.keys(updates).length} items marked for quick sale - preventing waste! 🌱`,
+      `Mission accomplished! ${Object.keys(updates).length} products now at clearance prices - sustainability wins! ♻️`,
+      `Waste reduction success! ${Object.keys(updates).length} items repriced for immediate movement! 🎯`,
+      `Green initiative active! ${Object.keys(updates).length} products now have clearance pricing! 🌿`
+    ];
+    
+    const randomSuccessMessage = successMessages[Math.floor(Math.random() * successMessages.length)];
+    
+    // Show success notification with confetti
+    onNotification({
+      type: 'success',
+      title: 'Clearance Prices Live! 🎉',
+      message: randomSuccessMessage,
+      showConfetti: true,
+      confettiIntensity: confettiIntensity,
       duration: 6000
     });
     
@@ -277,6 +389,26 @@ export default function AISimulationPanel({ onPriceUpdate, onNotification }) {
               </div>
             </div>
 
+            {/* Confetti Intensity Control */}
+            <div className="flex items-center justify-between">
+              <span className="text-sm">Confetti Power:</span>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => setConfettiIntensity(Math.max(20, confettiIntensity - 10))}
+                  className="w-6 h-6 bg-gray-100 rounded text-sm hover:bg-gray-200"
+                >
+                  -
+                </button>
+                <span className="text-sm font-medium w-8 text-center">{confettiIntensity}</span>
+                <button 
+                  onClick={() => setConfettiIntensity(Math.min(100, confettiIntensity + 10))}
+                  className="w-6 h-6 bg-gray-100 rounded text-sm hover:bg-gray-200"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
             {/* Duration Control for Retail Adjustment */}
             <div className="flex items-center justify-between">
               <span className="text-sm">Process Duration:</span>
@@ -290,6 +422,26 @@ export default function AISimulationPanel({ onPriceUpdate, onNotification }) {
                 <span className="text-sm font-medium w-12 text-center">{retailDuration/1000}s</span>
                 <button 
                   onClick={() => setRetailDuration(Math.min(15000, retailDuration + 1000))}
+                  className="w-6 h-6 bg-gray-100 rounded text-sm hover:bg-gray-200"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            {/* Clearance Duration Control */}
+            <div className="flex items-center justify-between">
+              <span className="text-sm">Clearance Duration:</span>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => setClearanceDuration(Math.max(2000, clearanceDuration - 1000))}
+                  className="w-6 h-6 bg-gray-100 rounded text-sm hover:bg-gray-200"
+                >
+                  -
+                </button>
+                <span className="text-sm font-medium w-12 text-center">{clearanceDuration/1000}s</span>
+                <button 
+                  onClick={() => setClearanceDuration(Math.min(12000, clearanceDuration + 1000))}
                   className="w-6 h-6 bg-gray-100 rounded text-sm hover:bg-gray-200"
                 >
                   +
@@ -337,12 +489,21 @@ export default function AISimulationPanel({ onPriceUpdate, onNotification }) {
               </Button>
 
               <Button
+                onClick={handleExpiredItemsClearance}
+                disabled={isUpdating}
+                className="w-full bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-sm"
+                size="sm"
+              >
+                {isUpdating && lastUpdateType === 'Expired Items Clearance' ? '🔄 Scanning...' : '🗑️ Clearance Pricing (Ctrl+Alt+5 / F6)'}
+              </Button>
+
+              <Button
                 onClick={handleRetailAdjustment}
                 disabled={isUpdating}
                 className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-sm"
                 size="sm"
               >
-                {isUpdating && lastUpdateType === 'Retail Price Adjustment' ? '🔄 Analyzing...' : '🏪 Retail Price Match (Ctrl+Alt+4 / F5)'}
+                {isUpdating && lastUpdateType === 'Retail Price Adjustment' ? '🔄 Hunting for deals...' : '🏪 Retail Price Match (Ctrl+Alt+4 / F5)'}
               </Button>
 
               {updateCount > 0 && (
@@ -366,6 +527,7 @@ export default function AISimulationPanel({ onPriceUpdate, onNotification }) {
                 <div>Ctrl+Alt+2 / F3: Full AI</div>
                 <div>Ctrl+Alt+3 / F2: Expiry Focus</div>
                 <div>Ctrl+Alt+4 / F5: Retail Match</div>
+                <div>Ctrl+Alt+5 / F6: Clearance</div>
                 <div>Ctrl+Alt+0 / F4: Reset Prices</div>
               </div>
             </div>

@@ -17,7 +17,9 @@ export const AI_CONFIG = {
   VIP_PREMIUM_DISCOUNT: 25, // 25% additional VIP discount on premium items
   OVERSTOCK_THRESHOLD: 30,   // Items with more than 30 units considered overstocked
   RETAIL_ADJUSTMENT_DURATION: 8000, // Duration for retail price adjustment simulation (8 seconds)
-  RETAIL_DISCOUNT_RANGE: { min: 5, max: 20 } // Discount range for retail adjustments
+  RETAIL_DISCOUNT_RANGE: { min: 5, max: 20 }, // Discount range for retail adjustments
+  CLEARANCE_DURATION: 6000, // Duration for clearance simulation (6 seconds)
+  CLEARANCE_DISCOUNT_RANGE: { min: 30, max: 70 } // Higher discounts for clearance
 };
 
 // Update AI configuration
@@ -269,32 +271,38 @@ export const simulateRetailPriceAdjustment = (products, maxItems = 6) => {
   const updates = {};
   const candidates = [];
   
-  // Simulate competitor price analysis
+  // Simulate competitor price analysis - focus on products that can benefit from retail matching
   products.forEach(product => {
-    // Focus on higher-priced items that have more room for competitive adjustment
-    if (product.prices.regular > 8 && Math.random() > 0.4) {
+    // Focus on items that aren't already heavily discounted and have reasonable prices
+    const hasExistingDiscount = product.prices.discounted && product.prices.discounted < product.prices.regular;
+    const isReasonablyPriced = product.prices.regular > 5; // Focus on items above $5
+    
+    // Include products with existing AI updates but also add new ones
+    if (isReasonablyPriced && Math.random() > 0.3) {
       // Simulate finding better competitor prices
       const discountPercent = Math.floor(
         Math.random() * (AI_CONFIG.RETAIL_DISCOUNT_RANGE.max - AI_CONFIG.RETAIL_DISCOUNT_RANGE.min) + 
         AI_CONFIG.RETAIL_DISCOUNT_RANGE.min
       );
       
-      const competitors = ['FreshMart', 'GroceryPlus', 'ValueFoods', 'QuickStop', 'MegaStore'];
+      const competitors = ['FreshMart', 'GroceryPlus', 'ValueFoods', 'QuickStop', 'MegaStore', 'PriceSmart'];
       const competitor = competitors[Math.floor(Math.random() * competitors.length)];
       
-      const newDiscountedPrice = product.prices.regular * (1 - discountPercent / 100);
-      const newVipPrice = Math.min(product.prices.vip, newDiscountedPrice * 0.9);
+      // Calculate new prices based on current prices (not just regular)
+      const basePrice = hasExistingDiscount ? product.prices.discounted : product.prices.regular;
+      const newDiscountedPrice = basePrice * (1 - discountPercent / 100);
+      const newVipPrice = Math.min(product.prices.vip, newDiscountedPrice * 0.85);
       
       candidates.push({
         productId: product.id,
-        priority: product.prices.regular + Math.random() * 10, // Higher priority for expensive items
+        priority: product.prices.regular + Math.random() * 15, // Higher priority for expensive items
         update: {
           prices: {
             regular: product.prices.regular,
             discounted: Math.round(newDiscountedPrice * 100) / 100,
             vip: Math.round(newVipPrice * 100) / 100
           },
-          reason: `Competitive Agent: Found ${competitor} selling at $${(product.prices.regular * (1 - (discountPercent + 2) / 100)).toFixed(2)} - Adjusted by ${discountPercent}%`,
+          reason: `Market Agent: Found ${competitor} at $${(basePrice * (1 - (discountPercent + 3) / 100)).toFixed(2)} - Price matched with ${discountPercent}% savings!`,
           timestamp: new Date().toISOString()
         }
       });
@@ -306,11 +314,92 @@ export const simulateRetailPriceAdjustment = (products, maxItems = 6) => {
     .sort((a, b) => b.priority - a.priority)
     .slice(0, maxItems);
   
-  // Apply the updates
+  // Apply the updates - preserve existing AI updates and add new ones
   selectedUpdates.forEach(({ productId, update }) => {
     updates[productId] = update;
   });
   
+  // Merge with existing updates instead of replacing them
+  aiUpdatedPrices = { ...aiUpdatedPrices, ...updates };
+  return updates;
+};
+
+// Simulate Expired Items Clearance with aggressive pricing
+export const simulateExpiredItemsClearance = (products, maxItems = 8) => {
+  aiAgentActive = true;
+  
+  const updates = {};
+  const candidates = [];
+  
+  // Focus on items that are expiring soon or overstocked
+  products.forEach(product => {
+    const daysToExpiry = Math.ceil((new Date(product.expiryDate) - new Date()) / (1000 * 60 * 60 * 24));
+    const isExpiringSoon = daysToExpiry >= 0 && daysToExpiry <= 4;
+    const isOverstocked = product.inventory > AI_CONFIG.OVERSTOCK_THRESHOLD;
+    const isLowMoving = product.inventory > 20 && Math.random() > 0.6; // Simulate slow-moving items
+    
+    if (isExpiringSoon || isOverstocked || isLowMoving) {
+      let discountPercent;
+      let reason;
+      let priority;
+      
+      if (daysToExpiry <= 0) {
+        // Items expired today - maximum clearance
+        discountPercent = Math.floor(Math.random() * 20) + 60; // 60-80% off
+        reason = `Clearance Agent: URGENT CLEARANCE ${discountPercent}% OFF - Expired today, must move immediately!`;
+        priority = 100;
+      } else if (daysToExpiry === 1) {
+        // Items expiring tomorrow - high clearance
+        discountPercent = Math.floor(Math.random() * 15) + 45; // 45-60% off
+        reason = `Clearance Agent: FLASH CLEARANCE ${discountPercent}% OFF - Expires tomorrow, clear inventory now!`;
+        priority = 90;
+      } else if (daysToExpiry <= 3) {
+        // Items expiring in 2-3 days - moderate clearance
+        discountPercent = Math.floor(Math.random() * 15) + 35; // 35-50% off
+        reason = `Clearance Agent: EARLY CLEARANCE ${discountPercent}% OFF - Expires in ${daysToExpiry} days`;
+        priority = 80 - daysToExpiry * 10;
+      } else if (isOverstocked) {
+        // Overstocked items - inventory clearance
+        discountPercent = Math.floor(Math.random() * 20) + 25; // 25-45% off
+        reason = `Inventory Agent: OVERSTOCK CLEARANCE ${discountPercent}% OFF - Reducing ${product.inventory} units`;
+        priority = Math.min(product.inventory, 70);
+      } else {
+        // Slow-moving items - promotional clearance
+        discountPercent = Math.floor(Math.random() * 15) + 20; // 20-35% off
+        reason = `Movement Agent: PROMOTIONAL CLEARANCE ${discountPercent}% OFF - Boosting product movement`;
+        priority = 40 + Math.random() * 20;
+      }
+      
+      const newDiscountedPrice = product.prices.regular * (1 - discountPercent / 100);
+      const newVipPrice = Math.min(product.prices.vip, newDiscountedPrice * 0.8); // Extra VIP savings on clearance
+      
+      candidates.push({
+        productId: product.id,
+        priority: priority,
+        update: {
+          prices: {
+            regular: product.prices.regular,
+            discounted: Math.round(newDiscountedPrice * 100) / 100,
+            vip: Math.round(newVipPrice * 100) / 100
+          },
+          reason,
+          timestamp: new Date().toISOString()
+        }
+      });
+    }
+  });
+  
+  // Sort by priority (highest first) and select top items
+  const selectedUpdates = candidates
+    .sort((a, b) => b.priority - a.priority)
+    .slice(0, maxItems);
+  
+  // Apply the updates - merge with existing updates
+  selectedUpdates.forEach(({ productId, update }) => {
+    updates[productId] = update;
+  });
+  
+  // Merge with existing updates instead of replacing them
   aiUpdatedPrices = { ...aiUpdatedPrices, ...updates };
   return updates;
 };
