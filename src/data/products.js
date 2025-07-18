@@ -379,272 +379,272 @@ export const products = [
     nutritionScore: "B",
     brand: "Golden Hive"
   },
-  {
-    id: "021",
-    name: "Potato Chips",
-    category: "snacks",
-    image: "/images/products/chips.jpg",
-    expiryDate: "2025-03-30",
-    inventory: 50,
-    isQuickSale: false,
-    isFlashSale: true,
-    madeInCanada: true,
-    prices: {
-      regular: 3.99,
-      discounted: 2.99,
-      vip: 2.49
-    },
-    description: "Crispy kettle-cooked potato chips",
-    nutritionScore: "C",
-    brand: "Crispy Crunch"
-  },
-  {
-    id: "022",
-    name: "Green Tea",
-    category: "beverages",
-    image: "/images/products/green-tea.jpg",
-    expiryDate: "2026-06-30",
-    inventory: 35,
-    isQuickSale: false,
-    isFlashSale: false,
-    madeInCanada: false,
-    prices: {
-      regular: 6.99,
-      discounted: null,
-      vip: 4.99
-    },
-    description: "Premium organic green tea bags",
-    nutritionScore: "A+",
-    brand: "Zen Garden"
-  },
-  {
-    id: "023",
-    name: "Mushrooms",
-    category: "produce",
-    image: "/images/products/mushrooms.jpg",
-    expiryDate: "2025-01-22",
-    inventory: 28,
-    isQuickSale: false,
-    isFlashSale: false,
-    madeInCanada: true,
-    prices: {
-      regular: 4.49,
-      discounted: null,
-      vip: 3.49
-    },
-    description: "Fresh button mushrooms, locally grown",
-    nutritionScore: "A",
-    brand: "Forest Fresh"
-  },
-  {
-    id: "024",
-    name: "Almond Butter",
-    category: "spreads",
-    image: "/images/products/almond-butter.jpg",
-    expiryDate: "2025-07-15",
-    inventory: 16,
-    isQuickSale: false,
-    isFlashSale: false,
-    madeInCanada: false,
-    prices: {
-      regular: 12.99,
-      discounted: null,
-      vip: 9.99
-    },
-    description: "Natural almond butter, no added sugar",
-    nutritionScore: "A",
-    brand: "Nutty Goodness"
-  },
-  {
-    id: "025",
-    name: "Frozen Pizza",
-    category: "frozen",
-    image: "/images/products/pizza.jpg",
-    expiryDate: "2025-05-30",
-    inventory: 22,
-    isQuickSale: false,
-    isFlashSale: true,
-    madeInCanada: true,
-    prices: {
-      regular: 7.99,
-      discounted: 5.99,
-      vip: 4.99
-    },
-    description: "Deluxe frozen pizza with Canadian toppings",
-    nutritionScore: "C+",
-    brand: "Maple Kitchen"
-  },
-  {
-    id: "026",
-    name: "Orange Juice",
-    category: "beverages",
-    image: "/images/products/orange-juice.jpg",
-    expiryDate: "2025-01-25",
-    inventory: 30,
-    isQuickSale: true,
-    isFlashSale: false,
-    madeInCanada: false,
-    prices: {
-      regular: 4.99,
-      discounted: 3.49,
-      vip: 2.99
-    },
-    description: "100% pure orange juice, not from concentrate",
-    nutritionScore: "B+",
-    brand: "Sunshine Citrus"
-  },
-  {
-    id: "027",
-    name: "Quinoa",
-    category: "grains",
-    image: "/images/products/quinoa.jpg",
-    expiryDate: "2025-10-15",
-    inventory: 20,
-    isQuickSale: false,
-    isFlashSale: false,
-    madeInCanada: false,
-    prices: {
-      regular: 8.99,
-      discounted: null,
-      vip: 6.99
-    },
-    description: "Organic tri-color quinoa, high in protein",
-    nutritionScore: "A+",
-    brand: "Ancient Grains"
-  },
-  {
-    id: "028",
-    name: "Bell Peppers",
-    category: "produce",
-    image: "/images/products/bell-peppers.jpg",
-    expiryDate: "2025-01-23",
-    inventory: 42,
-    isQuickSale: false,
-    isFlashSale: false,
-    madeInCanada: true,
-    prices: {
-      regular: 5.99,
-      discounted: null,
-      vip: 4.49
-    },
-    description: "Colorful bell peppers, greenhouse grown",
-    nutritionScore: "A+",
-    brand: "Greenhouse Gardens"
-  },
-  {
-    id: "029",
-    name: "Dark Chocolate",
-    category: "confectionery",
-    image: "/images/products/dark-chocolate.jpg",
-    expiryDate: "2025-08-30",
-    inventory: 25,
-    isQuickSale: false,
-    isFlashSale: true,
-    madeInCanada: true,
-    prices: {
-      regular: 6.99,
-      discounted: 4.99,
-      vip: 3.99
-    },
-    description: "70% dark chocolate bar, artisan crafted",
-    nutritionScore: "B",
-    brand: "Cocoa Dreams"
-  },
-  {
-    id: "030",
-    name: "Coconut Milk",
-    category: "beverages",
-    image: "/images/products/coconut-milk.jpg",
-    expiryDate: "2025-04-15",
-    inventory: 18,
-    isQuickSale: false,
-    isFlashSale: false,
-    madeInCanada: false,
-    prices: {
-      regular: 3.99,
-      discounted: null,
-      vip: 2.99
-    },
-    description: "Creamy coconut milk, perfect for cooking",
-    nutritionScore: "B+",
-    brand: "Tropical Coast"
-  },
-  {
-    id: "031",
-    name: "Sweet Potatoes",
-    category: "produce",
-    image: "/images/products/sweet-potatoes.jpg",
-    expiryDate: "2025-02-10",
-    inventory: 35,
-    isQuickSale: false,
-    isFlashSale: false,
-    madeInCanada: true,
-    prices: {
-      regular: 3.99,
-      discounted: null,
-      vip: 2.99
-    },
-    description: "Fresh sweet potatoes, locally sourced",
-    nutritionScore: "A+",
-    brand: "Root Harvest"
-  },
-  {
-    id: "032",
-    name: "Protein Powder",
-    category: "supplements",
-    image: "/images/products/protein-powder.jpg",
-    expiryDate: "2025-12-31",
-    inventory: 12,
-    isQuickSale: false,
-    isFlashSale: false,
-    madeInCanada: true,
-    prices: {
-      regular: 39.99,
-      discounted: null,
-      vip: 29.99
-    },
-    description: "Whey protein powder, vanilla flavor",
-    nutritionScore: "A",
-    brand: "Muscle Fuel"
-  },
-  {
-    id: "033",
-    name: "Sourdough Starter",
-    category: "bakery",
-    image: "/images/products/sourdough-starter.jpg",
-    expiryDate: "2025-02-28",
-    inventory: 8,
-    isQuickSale: true,
-    isFlashSale: false,
-    madeInCanada: true,
-    prices: {
-      regular: 12.99,
-      discounted: 8.99,
-      vip: 7.49
-    },
-    description: "Live sourdough starter, 100+ years old",
-    nutritionScore: "B+",
-    brand: "Heritage Bakery"
-  },
-  {
-    id: "034",
-    name: "Smoked Salmon",
-    category: "seafood",
-    image: "/images/products/smoked-salmon.jpg",
-    expiryDate: "2025-01-28",
-    inventory: 14,
-    isQuickSale: false,
-    isFlashSale: true,
-    madeInCanada: true,
-    prices: {
-      regular: 19.99,
-      discounted: 15.99,
-      vip: 13.99
-    },
-    description: "Cold-smoked Pacific salmon, sliced",
-    nutritionScore: "A+",
-    brand: "Pacific Smokehouse"
-  }
+  // {
+  //   id: "021",
+  //   name: "Potato Chips",
+  //   category: "snacks",
+  //   image: "/images/products/chips.jpg",
+  //   expiryDate: "2025-03-30",
+  //   inventory: 50,
+  //   isQuickSale: false,
+  //   isFlashSale: true,
+  //   madeInCanada: true,
+  //   prices: {
+  //     regular: 3.99,
+  //     discounted: 2.99,
+  //     vip: 2.49
+  //   },
+  //   description: "Crispy kettle-cooked potato chips",
+  //   nutritionScore: "C",
+  //   brand: "Crispy Crunch"
+  // },
+  // {
+  //   id: "022",
+  //   name: "Green Tea",
+  //   category: "beverages",
+  //   image: "/images/products/green-tea.jpg",
+  //   expiryDate: "2026-06-30",
+  //   inventory: 35,
+  //   isQuickSale: false,
+  //   isFlashSale: false,
+  //   madeInCanada: false,
+  //   prices: {
+  //     regular: 6.99,
+  //     discounted: null,
+  //     vip: 4.99
+  //   },
+  //   description: "Premium organic green tea bags",
+  //   nutritionScore: "A+",
+  //   brand: "Zen Garden"
+  // },
+  // {
+  //   id: "023",
+  //   name: "Mushrooms",
+  //   category: "produce",
+  //   image: "/images/products/mushrooms.jpg",
+  //   expiryDate: "2025-01-22",
+  //   inventory: 28,
+  //   isQuickSale: false,
+  //   isFlashSale: false,
+  //   madeInCanada: true,
+  //   prices: {
+  //     regular: 4.49,
+  //     discounted: null,
+  //     vip: 3.49
+  //   },
+  //   description: "Fresh button mushrooms, locally grown",
+  //   nutritionScore: "A",
+  //   brand: "Forest Fresh"
+  // },
+  // {
+  //   id: "024",
+  //   name: "Almond Butter",
+  //   category: "spreads",
+  //   image: "/images/products/almond-butter.jpg",
+  //   expiryDate: "2025-07-15",
+  //   inventory: 16,
+  //   isQuickSale: false,
+  //   isFlashSale: false,
+  //   madeInCanada: false,
+  //   prices: {
+  //     regular: 12.99,
+  //     discounted: null,
+  //     vip: 9.99
+  //   },
+  //   description: "Natural almond butter, no added sugar",
+  //   nutritionScore: "A",
+  //   brand: "Nutty Goodness"
+  // },
+  // {
+  //   id: "025",
+  //   name: "Frozen Pizza",
+  //   category: "frozen",
+  //   image: "/images/products/pizza.jpg",
+  //   expiryDate: "2025-05-30",
+  //   inventory: 22,
+  //   isQuickSale: false,
+  //   isFlashSale: true,
+  //   madeInCanada: true,
+  //   prices: {
+  //     regular: 7.99,
+  //     discounted: 5.99,
+  //     vip: 4.99
+  //   },
+  //   description: "Deluxe frozen pizza with Canadian toppings",
+  //   nutritionScore: "C+",
+  //   brand: "Maple Kitchen"
+  // },
+  // {
+  //   id: "026",
+  //   name: "Orange Juice",
+  //   category: "beverages",
+  //   image: "/images/products/orange-juice.jpg",
+  //   expiryDate: "2025-01-25",
+  //   inventory: 30,
+  //   isQuickSale: true,
+  //   isFlashSale: false,
+  //   madeInCanada: false,
+  //   prices: {
+  //     regular: 4.99,
+  //     discounted: 3.49,
+  //     vip: 2.99
+  //   },
+  //   description: "100% pure orange juice, not from concentrate",
+  //   nutritionScore: "B+",
+  //   brand: "Sunshine Citrus"
+  // },
+  // {
+  //   id: "027",
+  //   name: "Quinoa",
+  //   category: "grains",
+  //   image: "/images/products/quinoa.jpg",
+  //   expiryDate: "2025-10-15",
+  //   inventory: 20,
+  //   isQuickSale: false,
+  //   isFlashSale: false,
+  //   madeInCanada: false,
+  //   prices: {
+  //     regular: 8.99,
+  //     discounted: null,
+  //     vip: 6.99
+  //   },
+  //   description: "Organic tri-color quinoa, high in protein",
+  //   nutritionScore: "A+",
+  //   brand: "Ancient Grains"
+  // },
+  // {
+  //   id: "028",
+  //   name: "Bell Peppers",
+  //   category: "produce",
+  //   image: "/images/products/bell-peppers.jpg",
+  //   expiryDate: "2025-01-23",
+  //   inventory: 42,
+  //   isQuickSale: false,
+  //   isFlashSale: false,
+  //   madeInCanada: true,
+  //   prices: {
+  //     regular: 5.99,
+  //     discounted: null,
+  //     vip: 4.49
+  //   },
+  //   description: "Colorful bell peppers, greenhouse grown",
+  //   nutritionScore: "A+",
+  //   brand: "Greenhouse Gardens"
+  // },
+  // {
+  //   id: "029",
+  //   name: "Dark Chocolate",
+  //   category: "confectionery",
+  //   image: "/images/products/dark-chocolate.jpg",
+  //   expiryDate: "2025-08-30",
+  //   inventory: 25,
+  //   isQuickSale: false,
+  //   isFlashSale: true,
+  //   madeInCanada: true,
+  //   prices: {
+  //     regular: 6.99,
+  //     discounted: 4.99,
+  //     vip: 3.99
+  //   },
+  //   description: "70% dark chocolate bar, artisan crafted",
+  //   nutritionScore: "B",
+  //   brand: "Cocoa Dreams"
+  // },
+  // {
+  //   id: "030",
+  //   name: "Coconut Milk",
+  //   category: "beverages",
+  //   image: "/images/products/coconut-milk.jpg",
+  //   expiryDate: "2025-04-15",
+  //   inventory: 18,
+  //   isQuickSale: false,
+  //   isFlashSale: false,
+  //   madeInCanada: false,
+  //   prices: {
+  //     regular: 3.99,
+  //     discounted: null,
+  //     vip: 2.99
+  //   },
+  //   description: "Creamy coconut milk, perfect for cooking",
+  //   nutritionScore: "B+",
+  //   brand: "Tropical Coast"
+  // },
+  // {
+  //   id: "031",
+  //   name: "Sweet Potatoes",
+  //   category: "produce",
+  //   image: "/images/products/sweet-potatoes.jpg",
+  //   expiryDate: "2025-02-10",
+  //   inventory: 35,
+  //   isQuickSale: false,
+  //   isFlashSale: false,
+  //   madeInCanada: true,
+  //   prices: {
+  //     regular: 3.99,
+  //     discounted: null,
+  //     vip: 2.99
+  //   },
+  //   description: "Fresh sweet potatoes, locally sourced",
+  //   nutritionScore: "A+",
+  //   brand: "Root Harvest"
+  // },
+  // {
+  //   id: "032",
+  //   name: "Protein Powder",
+  //   category: "supplements",
+  //   image: "/images/products/protein-powder.jpg",
+  //   expiryDate: "2025-12-31",
+  //   inventory: 12,
+  //   isQuickSale: false,
+  //   isFlashSale: false,
+  //   madeInCanada: true,
+  //   prices: {
+  //     regular: 39.99,
+  //     discounted: null,
+  //     vip: 29.99
+  //   },
+  //   description: "Whey protein powder, vanilla flavor",
+  //   nutritionScore: "A",
+  //   brand: "Muscle Fuel"
+  // },
+  // {
+  //   id: "033",
+  //   name: "Sourdough Starter",
+  //   category: "bakery",
+  //   image: "/images/products/sourdough-starter.jpg",
+  //   expiryDate: "2025-02-28",
+  //   inventory: 8,
+  //   isQuickSale: true,
+  //   isFlashSale: false,
+  //   madeInCanada: true,
+  //   prices: {
+  //     regular: 12.99,
+  //     discounted: 8.99,
+  //     vip: 7.49
+  //   },
+  //   description: "Live sourdough starter, 100+ years old",
+  //   nutritionScore: "B+",
+  //   brand: "Heritage Bakery"
+  // },
+  // {
+  //   id: "034",
+  //   name: "Smoked Salmon",
+  //   category: "seafood",
+  //   image: "/images/products/smoked-salmon.jpg",
+  //   expiryDate: "2025-01-28",
+  //   inventory: 14,
+  //   isQuickSale: false,
+  //   isFlashSale: true,
+  //   madeInCanada: true,
+  //   prices: {
+  //     regular: 19.99,
+  //     discounted: 15.99,
+  //     vip: 13.99
+  //   },
+  //   description: "Cold-smoked Pacific salmon, sliced",
+  //   nutritionScore: "A+",
+  //   brand: "Pacific Smokehouse"
+  // }
 ];
 
 export const getProductById = (id) => products.find(p => p.id === id);
