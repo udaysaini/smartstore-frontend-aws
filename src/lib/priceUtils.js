@@ -4,6 +4,25 @@ import { getUserSegment as getAuthUserSegment } from '@/lib/auth';
 let aiUpdatedPrices = {};
 let aiAgentActive = false;
 
+// AI Configuration
+export const AI_CONFIG = {
+  MAX_ITEMS_TO_UPDATE: 8, // Maximum number of items to update at once
+  EXPIRY_DISCOUNTS: {
+    TODAY: 50,        // 50% discount for items expiring today
+    TOMORROW: 40,     // 40% discount for items expiring tomorrow  
+    TWO_DAYS: 30,     // 30% discount for items expiring in 2 days
+    THREE_DAYS: 20    // 20% discount for items expiring in 3 days
+  },
+  INVENTORY_DISCOUNT: 15,  // 15% discount for overstocked items
+  VIP_PREMIUM_DISCOUNT: 25, // 25% additional VIP discount on premium items
+  OVERSTOCK_THRESHOLD: 30   // Items with more than 30 units considered overstocked
+};
+
+// Update AI configuration
+export const updateAIConfig = (newConfig) => {
+  Object.assign(AI_CONFIG, newConfig);
+};
+
 export const getPriceForUser = (product, userType) => {
   // Check if AI has updated this product's pricing
   const updatedProduct = getAIUpdatedProduct(product);
@@ -36,8 +55,16 @@ export const formatPrice = (price) => {
 
 export const getBadges = (product) => {
   const badges = [];
+  const updatedProduct = getAIUpdatedProduct(product);
   
-  if (product.isFlashSale) {
+  // Check if AI created a flash sale
+  if (updatedProduct.isAIUpdated && updatedProduct.aiReason.includes('FLASH SALE')) {
+    badges.push({
+      type: 'ai-flash-sale',
+      label: '🤖 AI Flash Sale',
+      color: 'bg-gradient-to-r from-red-500 to-orange-500'
+    });
+  } else if (product.isFlashSale) {
     badges.push({
       type: 'flash-sale',
       label: '⚡ Flash Sale',
@@ -87,6 +114,7 @@ export const getInventoryStatus = (inventory) => {
 };
 
 export const getPricingInfo = (product, userType) => {
+  console.log('Product info for pricing:', product);
   const updatedProduct = getAIUpdatedProduct(product);
   const regularPrice = updatedProduct.prices.regular;
   const discountedPrice = updatedProduct.prices.discounted;
@@ -121,6 +149,8 @@ export const hasDiscount = (product, userType) => {
 
 // AI Agent Simulation Functions
 export const getAIUpdatedProduct = (product) => {
+  console.log({product})
+  console.log('Checking AI updates for product:', aiUpdatedPrices);
   if (aiUpdatedPrices[product.id]) {
     return {
       ...product,
@@ -133,66 +163,123 @@ export const getAIUpdatedProduct = (product) => {
   return { ...product, isAIUpdated: false };
 };
 
-export const simulateAIPricing = (products) => {
+export const simulateAIPricing = (products, maxItems = AI_CONFIG.MAX_ITEMS_TO_UPDATE) => {
   aiAgentActive = true;
   
   // Simulate AI agents analyzing and updating prices
   const updates = {};
+  const candidates = []; // Array to store potential updates with priority
   
   products.forEach(product => {
-    // Pricing Agent: Reduce prices for items expiring soon
     const daysToExpiry = Math.ceil((new Date(product.expiryDate) - new Date()) / (1000 * 60 * 60 * 24));
     
-    if (daysToExpiry <= 3) {
-      // Flash sale for expiring items
-      const discountPercent = daysToExpiry === 1 ? 40 : daysToExpiry === 2 ? 30 : 20;
-      const newRegularPrice = product.prices.regular * (1 - discountPercent / 100);
+    // Priority 1: Items expiring very soon (0-3 days)
+    if (daysToExpiry >= 0 && daysToExpiry <= 3) {
+      let discountPercent;
+      let reason;
+      
+      if (daysToExpiry === 0) {
+        discountPercent = AI_CONFIG.EXPIRY_DISCOUNTS.TODAY;
+        reason = `Pricing Agent: ${discountPercent}% FLASH SALE - Expires TODAY!`;
+      } else if (daysToExpiry === 1) {
+        discountPercent = AI_CONFIG.EXPIRY_DISCOUNTS.TOMORROW;
+        reason = `Pricing Agent: ${discountPercent}% discount - Expires TOMORROW`;
+      } else if (daysToExpiry === 2) {
+        discountPercent = AI_CONFIG.EXPIRY_DISCOUNTS.TWO_DAYS;
+        reason = `Pricing Agent: ${discountPercent}% discount - Expires in 2 days`;
+      } else {
+        discountPercent = AI_CONFIG.EXPIRY_DISCOUNTS.THREE_DAYS;
+        reason = `Pricing Agent: ${discountPercent}% discount - Expires in 3 days`;
+      }
+      
+      const newDiscountedPrice = product.prices.regular * (1 - discountPercent / 100);
       const newVipPrice = product.prices.vip * (1 - (discountPercent + 10) / 100);
       
-      updates[product.id] = {
-        prices: {
-          regular: product.prices.regular,
-          discounted: Math.round(newRegularPrice * 100) / 100,
-          vip: Math.round(newVipPrice * 100) / 100
-        },
-        reason: `Pricing Agent: ${discountPercent}% discount due to ${daysToExpiry} day(s) to expiry`,
-        timestamp: new Date().toISOString()
-      };
+      candidates.push({
+        productId: product.id,
+        priority: 10 - daysToExpiry, // Higher priority for sooner expiry
+        update: {
+          prices: {
+            regular: product.prices.regular,
+            discounted: Math.round(newDiscountedPrice * 100) / 100,
+            vip: Math.round(newVipPrice * 100) / 100
+          },
+          reason,
+          timestamp: new Date().toISOString()
+        }
+      });
     }
-    // Inventory Agent: Reduce prices for overstocked items
-    else if (product.inventory > 30) {
-      const discountPercent = 15;
+    // Priority 2: Overstocked items
+    else if (product.inventory > AI_CONFIG.OVERSTOCK_THRESHOLD) {
+      const discountPercent = AI_CONFIG.INVENTORY_DISCOUNT;
       const newDiscountedPrice = product.prices.regular * (1 - discountPercent / 100);
       
-      updates[product.id] = {
-        prices: {
-          regular: product.prices.regular,
-          discounted: Math.round(newDiscountedPrice * 100) / 100,
-          vip: product.prices.vip
-        },
-        reason: `Inventory Agent: ${discountPercent}% discount to reduce overstock (${product.inventory} units)`,
-        timestamp: new Date().toISOString()
-      };
+      candidates.push({
+        productId: product.id,
+        priority: Math.min(product.inventory / 10, 8), // Higher priority for more stock
+        update: {
+          prices: {
+            regular: product.prices.regular,
+            discounted: Math.round(newDiscountedPrice * 100) / 100,
+            vip: product.prices.vip
+          },
+          reason: `Inventory Agent: ${discountPercent}% discount to reduce overstock (${product.inventory} units)`,
+          timestamp: new Date().toISOString()
+        }
+      });
     }
-    // Segment Agent: Special VIP deals on premium items
-    else if (product.prices.regular > 20 && Math.random() > 0.7) {
-      const vipDiscountPercent = 25;
+    // Priority 3: Premium VIP deals
+    else if (product.prices.regular > 20 && Math.random() > 0.6) {
+      const vipDiscountPercent = AI_CONFIG.VIP_PREMIUM_DISCOUNT;
       const newVipPrice = product.prices.vip * (1 - vipDiscountPercent / 100);
       
-      updates[product.id] = {
-        prices: {
-          regular: product.prices.regular,
-          discounted: product.prices.discounted,
-          vip: Math.round(newVipPrice * 100) / 100
-        },
-        reason: `Segment Agent: Enhanced VIP discount of ${vipDiscountPercent}% on premium item`,
-        timestamp: new Date().toISOString()
-      };
+      candidates.push({
+        productId: product.id,
+        priority: product.prices.regular / 10, // Higher priority for more expensive items
+        update: {
+          prices: {
+            regular: product.prices.regular,
+            discounted: product.prices.discounted,
+            vip: Math.round(newVipPrice * 100) / 100
+          },
+          reason: `Segment Agent: Enhanced VIP discount of ${vipDiscountPercent}% on premium item`,
+          timestamp: new Date().toISOString()
+        }
+      });
     }
+  });
+  
+  // Sort by priority (highest first) and take only the max number of items
+  const selectedUpdates = candidates
+    .sort((a, b) => b.priority - a.priority)
+    .slice(0, maxItems);
+  
+  // Apply the updates
+  selectedUpdates.forEach(({ productId, update }) => {
+    updates[productId] = update;
   });
   
   aiUpdatedPrices = updates;
   return updates;
+};
+
+// Quick AI simulation with different strategies
+export const simulateQuickAI = (products) => {
+  return simulateAIPricing(products, 3); // Only update 3 items for quick demo
+};
+
+export const simulateFullAI = (products) => {
+  return simulateAIPricing(products, AI_CONFIG.MAX_ITEMS_TO_UPDATE);
+};
+
+// Simulate specific scenarios
+export const simulateExpiryFocus = (products) => {
+  const expiringProducts = products.filter(product => {
+    const daysToExpiry = Math.ceil((new Date(product.expiryDate) - new Date()) / (1000 * 60 * 60 * 24));
+    return daysToExpiry >= 0 && daysToExpiry <= 3;
+  });
+  
+  return simulateAIPricing(expiringProducts, Math.min(expiringProducts.length, 5));
 };
 
 export const clearAIUpdates = () => {

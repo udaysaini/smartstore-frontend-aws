@@ -52,21 +52,16 @@ export default function ProductCard({ product, className = "" }) {
         <div className="relative">
           {/* Product Image */}
           <div className="relative aspect-square overflow-hidden bg-gray-100">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Image
-                src={product.image}
-                alt={product.name}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              />
-            </motion.div>
+            <Image
+              src={product.image}
+              alt={product.name}
+              fill
+              className="object-cover transition-transform duration-300 hover:scale-105"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            />
             
             {/* Badges with stagger animation */}
-            <div className="absolute top-2 left-2 flex flex-col gap-1">
+            <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
               {badges.map((badge, index) => (
                 <motion.span
                   key={badge.type}
@@ -86,7 +81,7 @@ export default function ProductCard({ product, className = "" }) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 20 }}
               transition={{ duration: 0.2 }}
-              className="absolute bottom-2 right-2"
+              className="absolute bottom-2 right-2 z-10"
             >
               <motion.div
                 whileTap={{ scale: 0.95 }}
@@ -110,24 +105,25 @@ export default function ProductCard({ product, className = "" }) {
               </motion.div>
             </motion.div>
 
-            {/* AI Updated Badge */}
+            {/* AI Updated Badge - positioned to not conflict with other badges */}
             {isAIUpdated && (
               <motion.div
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.5, type: "spring", stiffness: 500 }}
-                className="absolute top-2 right-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg"
+                className="absolute top-2 right-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg z-10"
               >
                 🤖 AI Updated
               </motion.div>
             )}
 
-            {/* Price animation overlay */}
-            {discount > 0 && (
+            {/* Price discount overlay - only show when not AI updated to avoid overlap */}
+            {discount > 0 && !isAIUpdated && (
               <motion.div
                 initial={{ scale: 0, rotate: -12 }}
                 animate={{ scale: isHovered ? 1 : 0 }}
-                className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full"
+                transition={{ duration: 0.2 }}
+                className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full z-10"
               >
                 -{discount}%
               </motion.div>

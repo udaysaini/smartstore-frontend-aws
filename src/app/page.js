@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { products, getFeaturedProducts } from '@/data/products';
 import { getFeaturedCategories } from '@/data/categories';
 import { STORE_CONFIG } from '@/lib/constants';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import * as motion from 'motion/react-client';
 
 export default function HomePage() {
@@ -27,6 +27,22 @@ export default function HomePage() {
   const handlePriceUpdate = () => {
     setPriceUpdateKey(prev => prev + 1); // Force re-render for AI price updates
   };
+
+  // Add global keyboard shortcut hint
+  useEffect(() => {
+    const showKeyboardHint = () => {
+      console.log('🤖 AI Demo Shortcuts:');
+      console.log('Ctrl+Alt+A: Toggle AI Panel');
+      console.log('Ctrl+Alt+1 / F1: Quick AI (3 items)');
+      console.log('Ctrl+Alt+2 / F3: Full AI Analysis');
+      console.log('Ctrl+Alt+3 / F2: Expiry-Focused Pricing');
+      console.log('Ctrl+Alt+0 / F4: Reset All Prices');
+    };
+    
+    // Show hint after 3 seconds
+    const timer = setTimeout(showKeyboardHint, 3000);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
