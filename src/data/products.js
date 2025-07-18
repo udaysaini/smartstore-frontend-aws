@@ -1,10 +1,66 @@
+// Helper function to calculate expiry dates
+const getExpiryDate = (productType, daysToAdd) => {
+  const today = new Date();
+  today.setDate(today.getDate() + daysToAdd);
+  return today.toISOString().split('T')[0]; // Returns YYYY-MM-DD format
+};
+
+// Helper function to get expiry days based on product category/name
+const getExpiryDays = (productName, category) => {
+  const name = productName.toLowerCase();
+  
+  // Fresh produce (2-7 days)
+  if (name.includes('banana')) return 4;
+  if (name.includes('apple')) return 10;
+  if (name.includes('lettuce') || name.includes('spinach') || name.includes('kale')) return 5;
+  if (name.includes('tomato')) return 7;
+  if (name.includes('carrot')) return 14;
+  if (name.includes('potato')) return 21;
+  if (name.includes('onion')) return 30;
+  
+  // Dairy products (5-14 days)
+  if (name.includes('milk') || name.includes('yogurt')) return 7;
+  if (name.includes('cheese')) return 21;
+  if (name.includes('butter')) return 30;
+  
+  // Meat & Seafood (1-3 days fresh, longer if frozen)
+  if (name.includes('chicken') || name.includes('beef') || name.includes('fish')) return 3;
+  
+  // Bread & Bakery (3-7 days)
+  if (name.includes('bread') || name.includes('bagel')) return 5;
+  
+  // Canned goods (1-2 years)
+  if (name.includes('canned') || name.includes('can ')) return 365;
+  
+  // Dry goods (6 months - 1 year)
+  if (name.includes('rice') || name.includes('pasta') || name.includes('flour')) return 365;
+  if (name.includes('cereal') || name.includes('crackers')) return 180;
+  
+  // Frozen items (3-6 months)
+  if (name.includes('frozen')) return 90;
+  
+  // Default based on category
+  switch (category?.toLowerCase()) {
+    case 'fresh produce':
+    case 'fruits':
+    case 'vegetables': return 7;
+    case 'dairy': return 10;
+    case 'meat': return 3;
+    case 'bakery': return 5;
+    case 'pantry':
+    case 'canned goods': return 365;
+    case 'frozen': return 90;
+    default: return 30; // Default 1 month
+  }
+};
+
 export const products = [
   {
     id: "001",
     name: "Greek Yogurt",
     category: "dairy",
     image: "/images/products/yogurt.jpg",
-    expiryDate: "2025-01-20",
+    expiryDate: getExpiryDate("Greek Yogurt", getExpiryDays("Greek Yogurt", "dairy")),
     inventory: 12,
     isQuickSale: true,
     isFlashSale: true,
@@ -23,7 +79,7 @@ export const products = [
     name: "Organic Bananas",
     category: "produce",
     image: "/images/products/bananas.jpg",
-    expiryDate: "2025-01-18",
+    expiryDate: getExpiryDate("Organic Bananas", getExpiryDays("Organic Bananas", "produce")),
     inventory: 45,
     isQuickSale: false,
     isFlashSale: false,
@@ -42,7 +98,7 @@ export const products = [
     name: "Artisan Bread",
     category: "bakery",
     image: "/images/products/bread.jpg", 
-    expiryDate: "2025-01-17",
+    expiryDate: getExpiryDate("Artisan Bread", getExpiryDays("Artisan Bread", "bakery")),
     inventory: 8,
     isQuickSale: true,
     isFlashSale: true,
@@ -61,7 +117,7 @@ export const products = [
     name: "Premium Ribeye Steak",
     category: "meat",
     image: "/images/products/ribeye.jpg",
-    expiryDate: "2025-01-22",
+    expiryDate: getExpiryDate("Premium Ribeye Steak", getExpiryDays("Premium Ribeye Steak", "meat")),
     inventory: 15,
     isQuickSale: false,
     isFlashSale: false,
@@ -80,7 +136,7 @@ export const products = [
     name: "Maple Syrup",
     category: "condiments",
     image: "/images/products/maple-syrup.jpg",
-    expiryDate: "2026-03-15",
+    expiryDate: getExpiryDate("Maple Syrup", getExpiryDays("Maple Syrup", "condiments")),
     inventory: 25,
     isQuickSale: false,
     isFlashSale: true,
@@ -99,7 +155,7 @@ export const products = [
     name: "Atlantic Salmon",
     category: "seafood",
     image: "/images/products/salmon.jpg",
-    expiryDate: "2025-01-19",
+    expiryDate: getExpiryDate("Atlantic Salmon", getExpiryDays("Atlantic Salmon", "seafood")),
     inventory: 20,
     isQuickSale: true,
     isFlashSale: false,
@@ -118,7 +174,7 @@ export const products = [
     name: "Organic Free-Range Eggs",
     category: "dairy",
     image: "/images/products/eggs.jpg",
-    expiryDate: "2025-02-01",
+    expiryDate: getExpiryDate("Organic Free-Range Eggs", getExpiryDays("Organic Free-Range Eggs", "dairy")),
     inventory: 35,
     isQuickSale: false,
     isFlashSale: false,
@@ -137,7 +193,7 @@ export const products = [
     name: "Avocados",
     category: "produce",
     image: "/images/products/avocados.jpg",
-    expiryDate: "2025-01-21",
+    expiryDate: getExpiryDate("Avocados", getExpiryDays("Avocados", "produce")),
     inventory: 30,
     isQuickSale: false,
     isFlashSale: true,
@@ -156,7 +212,7 @@ export const products = [
     name: "Cheddar Cheese",
     category: "dairy",
     image: "/images/products/cheddar.jpg",
-    expiryDate: "2025-02-15",
+    expiryDate: getExpiryDate("Cheddar Cheese", getExpiryDays("Cheddar Cheese", "dairy")),
     inventory: 18,
     isQuickSale: false,
     isFlashSale: false,
@@ -175,7 +231,7 @@ export const products = [
     name: "Whole Grain Cereal",
     category: "breakfast",
     image: "/images/products/cereal.jpg",
-    expiryDate: "2025-06-30",
+    expiryDate: getExpiryDate("Whole Grain Cereal", getExpiryDays("Whole Grain Cereal", "breakfast")),
     inventory: 40,
     isQuickSale: false,
     isFlashSale: false,
@@ -194,7 +250,7 @@ export const products = [
     name: "Ground Coffee",
     category: "beverages",
     image: "/images/products/coffee.jpg",
-    expiryDate: "2025-12-31",
+    expiryDate: getExpiryDate("Ground Coffee", getExpiryDays("Ground Coffee", "beverages")),
     inventory: 22,
     isQuickSale: false,
     isFlashSale: true,
@@ -213,7 +269,7 @@ export const products = [
     name: "Chicken Breast",
     category: "meat",
     image: "/images/products/chicken.jpg",
-    expiryDate: "2025-01-20",
+    expiryDate: getExpiryDate("Chicken Breast", getExpiryDays("Chicken Breast", "meat")),
     inventory: 25,
     isQuickSale: true,
     isFlashSale: false,
@@ -232,7 +288,7 @@ export const products = [
     name: "Frozen Blueberries",
     category: "frozen",
     image: "/images/products/blueberries.jpg",
-    expiryDate: "2025-08-15",
+    expiryDate: getExpiryDate("Frozen Blueberries", getExpiryDays("Frozen Blueberries", "frozen")),
     inventory: 32,
     isQuickSale: false,
     isFlashSale: false,
@@ -251,7 +307,7 @@ export const products = [
     name: "Pasta Sauce",
     category: "condiments",
     image: "/images/products/pasta-sauce.jpg",
-    expiryDate: "2025-09-01",
+    expiryDate: getExpiryDate("Pasta Sauce", getExpiryDays("Pasta Sauce", "condiments")),
     inventory: 28,
     isQuickSale: false,
     isFlashSale: true,
@@ -270,7 +326,7 @@ export const products = [
     name: "Ice Cream",
     category: "frozen",
     image: "/images/products/ice-cream.jpg",
-    expiryDate: "2025-04-30",
+    expiryDate: getExpiryDate("Ice Cream", getExpiryDays("Ice Cream", "frozen")),
     inventory: 15,
     isQuickSale: false,
     isFlashSale: false,
@@ -289,7 +345,7 @@ export const products = [
     name: "Baby Spinach",
     category: "produce",
     image: "/images/products/spinach.jpg",
-    expiryDate: "2025-01-19",
+    expiryDate: getExpiryDate("Baby Spinach", getExpiryDays("Baby Spinach", "produce")),
     inventory: 38,
     isQuickSale: true,
     isFlashSale: false,
@@ -308,7 +364,7 @@ export const products = [
     name: "Granola Bars",
     category: "snacks",
     image: "/images/products/granola-bars.jpg",
-    expiryDate: "2025-05-15",
+    expiryDate: getExpiryDate("Granola Bars", getExpiryDays("Granola Bars", "snacks")),
     inventory: 45,
     isQuickSale: false,
     isFlashSale: false,
@@ -327,7 +383,7 @@ export const products = [
     name: "Olive Oil",
     category: "condiments",
     image: "/images/products/olive-oil.jpg",
-    expiryDate: "2026-01-15",
+    expiryDate: getExpiryDate("Olive Oil", getExpiryDays("Olive Oil", "condiments")),
     inventory: 20,
     isQuickSale: false,
     isFlashSale: true,
@@ -346,7 +402,7 @@ export const products = [
     name: "Ground Turkey",
     category: "meat",
     image: "/images/products/turkey.jpg",
-    expiryDate: "2025-01-21",
+    expiryDate: getExpiryDate("Ground Turkey", getExpiryDays("Ground Turkey", "meat")),
     inventory: 18,
     isQuickSale: false,
     isFlashSale: false,
@@ -365,7 +421,7 @@ export const products = [
     name: "Honey",
     category: "condiments",
     image: "/images/products/honey.jpg",
-    expiryDate: "2027-01-01",
+    expiryDate: getExpiryDate("Honey", getExpiryDays("Honey", "condiments")),
     inventory: 24,
     isQuickSale: false,
     isFlashSale: false,
