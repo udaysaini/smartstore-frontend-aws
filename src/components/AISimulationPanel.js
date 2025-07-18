@@ -8,6 +8,7 @@ import {
   simulateQuickAI, 
   simulateFullAI, 
   simulateExpiryFocus,
+  simulateRetailPriceAdjustment,
   clearAIUpdates, 
   getAIAgentStatus, 
   getAIUpdatedProductsCount,
@@ -17,12 +18,13 @@ import {
 import { products } from '@/data/products';
 import * as motion from 'motion/react-client';
 
-export default function AISimulationPanel({ onPriceUpdate }) {
+export default function AISimulationPanel({ onPriceUpdate, onNotification }) {
   const [isVisible, setIsVisible] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [updateCount, setUpdateCount] = useState(0);
   const [lastUpdateType, setLastUpdateType] = useState('');
   const [maxItems, setMaxItems] = useState(AI_CONFIG.MAX_ITEMS_TO_UPDATE);
+  const [retailDuration, setRetailDuration] = useState(AI_CONFIG.RETAIL_ADJUSTMENT_DURATION); // New duration setting
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -91,6 +93,18 @@ export default function AISimulationPanel({ onPriceUpdate }) {
         e.preventDefault();
         handleClearUpdates();
       }
+      
+      // Ctrl+Alt+4: Retail Price Adjustment
+      if (e.ctrlKey && e.altKey && (e.key === '4' || e.code === 'Digit4')) {
+        e.preventDefault();
+        handleRetailAdjustment();
+      }
+      
+      // F5: Retail Price Adjustment
+      if (e.key === 'F5') {
+        e.preventDefault();
+        handleRetailAdjustment();
+      }
     };
     
     window.addEventListener('keydown', handleKeyPress);
@@ -127,6 +141,57 @@ export default function AISimulationPanel({ onPriceUpdate }) {
     clearAIUpdates();
     setUpdateCount(0);
     setLastUpdateType('');
+    if (onPriceUpdate) {
+      onPriceUpdate();
+    }
+  };
+
+  const handleRetailAdjustment = async () => {
+    if (isUpdating) return;
+    
+    setIsUpdating(true);
+    setLastUpdateType('Retail Price Adjustment');
+    
+    // Show loading notification
+    const loadingNotificationId = onNotification({
+      type: 'info',
+      title: 'AI Competitive Analysis',
+      message: 'Scraping competitor websites and analyzing market prices...',
+      showLoader: true,
+      duration: retailDuration,
+      autoRemove: false
+    });
+
+    // Update configuration
+    updateAIConfig({ 
+      MAX_ITEMS_TO_UPDATE: maxItems,
+      RETAIL_ADJUSTMENT_DURATION: retailDuration 
+    });
+    
+    // Wait for the specified duration
+    await new Promise(resolve => setTimeout(resolve, retailDuration));
+    
+    // Remove loading notification
+    if (onNotification.remove) {
+      onNotification.remove(loadingNotificationId);
+    }
+    
+    // Execute the retail adjustment
+    const updates = simulateRetailPriceAdjustment(products, maxItems);
+    setUpdateCount(Object.keys(updates).length);
+    
+    setIsUpdating(false);
+    
+    // Show success notification with confetti
+    onNotification({
+      type: 'success',
+      title: 'Prices Updated! 🎉',
+      message: `Found better prices for ${Object.keys(updates).length} products. You're now getting the best deals in town!`,
+      showConfetti: true,
+      duration: 6000
+    });
+    
+    // Notify parent components to re-render
     if (onPriceUpdate) {
       onPriceUpdate();
     }
@@ -212,6 +277,26 @@ export default function AISimulationPanel({ onPriceUpdate }) {
               </div>
             </div>
 
+            {/* Duration Control for Retail Adjustment */}
+            <div className="flex items-center justify-between">
+              <span className="text-sm">Process Duration:</span>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => setRetailDuration(Math.max(2000, retailDuration - 1000))}
+                  className="w-6 h-6 bg-gray-100 rounded text-sm hover:bg-gray-200"
+                >
+                  -
+                </button>
+                <span className="text-sm font-medium w-12 text-center">{retailDuration/1000}s</span>
+                <button 
+                  onClick={() => setRetailDuration(Math.min(15000, retailDuration + 1000))}
+                  className="w-6 h-6 bg-gray-100 rounded text-sm hover:bg-gray-200"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
             {/* AI Simulation Buttons */}
             <div className="space-y-2">
               <Button
@@ -251,6 +336,15 @@ export default function AISimulationPanel({ onPriceUpdate }) {
                 {isUpdating && lastUpdateType.includes('Custom') ? '🔄 Processing...' : `🎯 Custom (${maxItems} items)`}
               </Button>
 
+              <Button
+                onClick={handleRetailAdjustment}
+                disabled={isUpdating}
+                className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-sm"
+                size="sm"
+              >
+                {isUpdating && lastUpdateType === 'Retail Price Adjustment' ? '🔄 Analyzing...' : '🏪 Retail Price Match (Ctrl+Alt+4 / F5)'}
+              </Button>
+
               {updateCount > 0 && (
                 <Button
                   onClick={handleClearUpdates}
@@ -271,6 +365,7 @@ export default function AISimulationPanel({ onPriceUpdate }) {
                 <div>Ctrl+Alt+1 / F1: Quick AI</div>
                 <div>Ctrl+Alt+2 / F3: Full AI</div>
                 <div>Ctrl+Alt+3 / F2: Expiry Focus</div>
+                <div>Ctrl+Alt+4 / F5: Retail Match</div>
                 <div>Ctrl+Alt+0 / F4: Reset Prices</div>
               </div>
             </div>

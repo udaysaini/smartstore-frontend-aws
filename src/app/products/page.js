@@ -10,12 +10,15 @@ import { STORE_CONFIG } from '@/lib/constants';
 import { Suspense, useState } from 'react';
 import * as motion from 'motion/react-client';
 import AISimulationPanel from '@/components/AISimulationPanel';
+import NotificationSystem from '@/components/NotificationSystem';
+import useNotifications from '@/hooks/useNotifications';
 
 function ProductsContent() {
   const searchParams = useSearchParams();
   const filter = searchParams.get('filter'); // 'deals' or null for all products
   const [userKey, setUserKey] = useState(0); // Key to force re-render of product cards
   const [priceUpdateKey, setPriceUpdateKey] = useState(0); // Key for AI price updates
+  const { notifications, addNotification, removeNotification } = useNotifications();
   
   const displayProducts = filter === 'deals' ? getFeaturedProducts() : products;
   const pageTitle = filter === 'deals' ? 'All Deals & Flash Sales' : 'All Products';
@@ -30,6 +33,12 @@ function ProductsContent() {
   const handlePriceUpdate = () => {
     setPriceUpdateKey(prev => prev + 1); // Force re-render for AI price updates
   };
+
+  const handleNotification = (notification) => {
+    return addNotification(notification);
+  };
+
+  handleNotification.remove = removeNotification;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -123,7 +132,16 @@ function ProductsContent() {
       <FloatingCart />
       
       {/* AI Simulation Panel (Hidden - for demo) */}
-      <AISimulationPanel onPriceUpdate={handlePriceUpdate} />
+      <AISimulationPanel 
+        onPriceUpdate={handlePriceUpdate}
+        onNotification={handleNotification}
+      />
+
+      {/* Notification System */}
+      <NotificationSystem 
+        notifications={notifications}
+        onRemove={removeNotification}
+      />
     </div>
   );
 }

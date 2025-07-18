@@ -15,7 +15,9 @@ export const AI_CONFIG = {
   },
   INVENTORY_DISCOUNT: 15,  // 15% discount for overstocked items
   VIP_PREMIUM_DISCOUNT: 25, // 25% additional VIP discount on premium items
-  OVERSTOCK_THRESHOLD: 30   // Items with more than 30 units considered overstocked
+  OVERSTOCK_THRESHOLD: 30,   // Items with more than 30 units considered overstocked
+  RETAIL_ADJUSTMENT_DURATION: 8000, // Duration for retail price adjustment simulation (8 seconds)
+  RETAIL_DISCOUNT_RANGE: { min: 5, max: 20 } // Discount range for retail adjustments
 };
 
 // Update AI configuration
@@ -257,6 +259,59 @@ export const simulateAIPricing = (products, maxItems = AI_CONFIG.MAX_ITEMS_TO_UP
   });
   
   aiUpdatedPrices = updates;
+  return updates;
+};
+
+// Simulate Retail Price Adjustment based on competitor analysis
+export const simulateRetailPriceAdjustment = (products, maxItems = 6) => {
+  aiAgentActive = true;
+  
+  const updates = {};
+  const candidates = [];
+  
+  // Simulate competitor price analysis
+  products.forEach(product => {
+    // Focus on higher-priced items that have more room for competitive adjustment
+    if (product.prices.regular > 8 && Math.random() > 0.4) {
+      // Simulate finding better competitor prices
+      const discountPercent = Math.floor(
+        Math.random() * (AI_CONFIG.RETAIL_DISCOUNT_RANGE.max - AI_CONFIG.RETAIL_DISCOUNT_RANGE.min) + 
+        AI_CONFIG.RETAIL_DISCOUNT_RANGE.min
+      );
+      
+      const competitors = ['FreshMart', 'GroceryPlus', 'ValueFoods', 'QuickStop', 'MegaStore'];
+      const competitor = competitors[Math.floor(Math.random() * competitors.length)];
+      
+      const newDiscountedPrice = product.prices.regular * (1 - discountPercent / 100);
+      const newVipPrice = Math.min(product.prices.vip, newDiscountedPrice * 0.9);
+      
+      candidates.push({
+        productId: product.id,
+        priority: product.prices.regular + Math.random() * 10, // Higher priority for expensive items
+        update: {
+          prices: {
+            regular: product.prices.regular,
+            discounted: Math.round(newDiscountedPrice * 100) / 100,
+            vip: Math.round(newVipPrice * 100) / 100
+          },
+          reason: `Competitive Agent: Found ${competitor} selling at $${(product.prices.regular * (1 - (discountPercent + 2) / 100)).toFixed(2)} - Adjusted by ${discountPercent}%`,
+          timestamp: new Date().toISOString()
+        }
+      });
+    }
+  });
+  
+  // Sort by priority and select top items
+  const selectedUpdates = candidates
+    .sort((a, b) => b.priority - a.priority)
+    .slice(0, maxItems);
+  
+  // Apply the updates
+  selectedUpdates.forEach(({ productId, update }) => {
+    updates[productId] = update;
+  });
+  
+  aiUpdatedPrices = { ...aiUpdatedPrices, ...updates };
   return updates;
 };
 

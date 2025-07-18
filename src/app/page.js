@@ -11,10 +11,13 @@ import { getFeaturedCategories } from '@/data/categories';
 import { STORE_CONFIG } from '@/lib/constants';
 import { useState, useEffect } from 'react';
 import * as motion from 'motion/react-client';
+import NotificationSystem from '@/components/NotificationSystem';
+import useNotifications from '@/hooks/useNotifications';
 
 export default function HomePage() {
   const [userKey, setUserKey] = useState(0); // Key to force re-render of product cards
   const [priceUpdateKey, setPriceUpdateKey] = useState(0); // Key for AI price updates
+  const { notifications, addNotification, removeNotification } = useNotifications();
   
   const featuredProducts = getFeaturedProducts().slice(0, 4); // Only show 4 deals (1 row)
   const featuredCategories = getFeaturedCategories();
@@ -27,6 +30,13 @@ export default function HomePage() {
   const handlePriceUpdate = () => {
     setPriceUpdateKey(prev => prev + 1); // Force re-render for AI price updates
   };
+
+  const handleNotification = (notification) => {
+    return addNotification(notification);
+  };
+
+  // Add remove function to notification handler
+  handleNotification.remove = removeNotification;
 
   // Add global keyboard shortcut hint
   useEffect(() => {
@@ -295,7 +305,16 @@ export default function HomePage() {
       <FloatingCart />
 
       {/* AI Simulation Panel (Hidden - for demo) */}
-      <AISimulationPanel onPriceUpdate={handlePriceUpdate} />
+      <AISimulationPanel 
+        onPriceUpdate={handlePriceUpdate} 
+        onNotification={handleNotification}
+      />
+
+      {/* Notification System */}
+      <NotificationSystem 
+        notifications={notifications}
+        onRemove={removeNotification}
+      />
     </div>
   );
 }
