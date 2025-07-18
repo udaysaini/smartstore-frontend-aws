@@ -28,7 +28,7 @@ export default function AISimulationPanel({ onPriceUpdate }) {
   useEffect(() => {
     const handleKeyPress = (e) => {
       // Use the main keyboard number keys and check for the actual key value
-      console.log(`Key pressed: ${e.key}, Code: ${e.code}, Shift: ${e.shiftKey}, Ctrl: ${e.ctrlKey}`);
+        //   console.log(`Key pressed: ${e.key}, Code: ${e.code}, Shift: ${e.shiftKey}, Ctrl: ${e.ctrlKey}`);
       
       // Ctrl+Shift+A: Toggle panel visibility
       if (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) {

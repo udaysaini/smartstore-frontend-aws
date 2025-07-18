@@ -6,50 +6,78 @@ const getExpiryDate = (productType, daysToAdd) => {
 };
 
 // Helper function to get expiry days based on product category/name
+// Some items intentionally set to expire soon for AI discount scenarios
 const getExpiryDays = (productName, category) => {
   const name = productName.toLowerCase();
   
-  // Fresh produce (2-7 days)
-  if (name.includes('banana')) return 4;
-  if (name.includes('apple')) return 10;
-  if (name.includes('lettuce') || name.includes('spinach') || name.includes('kale')) return 5;
-  if (name.includes('tomato')) return 7;
+  // Fresh produce (1-10 days) - some expire soon for discounts
+  if (name.includes('banana')) return Math.random() < 0.5 ? 2 : 4; // 50% expire in 2 days
+  if (name.includes('apple')) return Math.random() < 0.3 ? 5 : 10; // 30% expire in 5 days
+  if (name.includes('lettuce') || name.includes('spinach') || name.includes('kale')) return Math.random() < 0.4 ? 2 : 5; // 40% expire in 2 days
+  if (name.includes('tomato')) return Math.random() < 0.3 ? 3 : 7; // 30% expire in 3 days
+  if (name.includes('avocado')) return Math.random() < 0.6 ? 1 : 3; // 60% expire in 1 day
   if (name.includes('carrot')) return 14;
   if (name.includes('potato')) return 21;
   if (name.includes('onion')) return 30;
   
-  // Dairy products (5-14 days)
-  if (name.includes('milk') || name.includes('yogurt')) return 7;
-  if (name.includes('cheese')) return 21;
+  // Dairy products (3-21 days) - some expire soon
+  if (name.includes('milk')) return Math.random() < 0.4 ? 2 : 7; // 40% expire in 2 days
+  if (name.includes('yogurt')) return Math.random() < 0.3 ? 3 : 7; // 30% expire in 3 days
+  if (name.includes('cheese')) return Math.random() < 0.2 ? 7 : 21; // 20% expire in 7 days
+  if (name.includes('eggs')) return Math.random() < 0.3 ? 5 : 14; // 30% expire in 5 days
   if (name.includes('butter')) return 30;
   
-  // Meat & Seafood (1-3 days fresh, longer if frozen)
-  if (name.includes('chicken') || name.includes('beef') || name.includes('fish')) return 3;
+  // Meat & Seafood (1-3 days) - most expire soon for realism
+  if (name.includes('chicken') || name.includes('turkey')) return Math.random() < 0.5 ? 1 : 3; // 50% expire in 1 day
+  if (name.includes('beef') || name.includes('steak')) return Math.random() < 0.4 ? 2 : 3; // 40% expire in 2 days
+  if (name.includes('fish') || name.includes('salmon')) return Math.random() < 0.6 ? 1 : 2; // 60% expire in 1 day
   
-  // Bread & Bakery (3-7 days)
-  if (name.includes('bread') || name.includes('bagel')) return 5;
+  // Bread & Bakery (2-5 days) - some expire soon
+  if (name.includes('bread') || name.includes('bagel')) return Math.random() < 0.4 ? 1 : 5; // 40% expire in 1 day
+  if (name.includes('starter')) return Math.random() < 0.3 ? 3 : 14; // 30% expire in 3 days
   
   // Canned goods (1-2 years)
-  if (name.includes('canned') || name.includes('can ')) return 365;
+  if (name.includes('canned') || name.includes('can ') || name.includes('sauce')) return 365;
   
   // Dry goods (6 months - 1 year)
-  if (name.includes('rice') || name.includes('pasta') || name.includes('flour')) return 365;
-  if (name.includes('cereal') || name.includes('crackers')) return 180;
+  if (name.includes('rice') || name.includes('pasta') || name.includes('flour') || name.includes('quinoa')) return 365;
+  if (name.includes('cereal') || name.includes('crackers') || name.includes('granola')) return 180;
+  
+  // Beverages - varies
+  if (name.includes('juice')) return Math.random() < 0.3 ? 3 : 7; // 30% expire in 3 days
+  if (name.includes('coffee') || name.includes('tea')) return 180;
+  if (name.includes('milk') && name.includes('coconut')) return 60;
+  
+  // Condiments & spreads
+  if (name.includes('honey') || name.includes('syrup') || name.includes('oil')) return 365;
+  if (name.includes('butter') && name.includes('almond')) return 180;
   
   // Frozen items (3-6 months)
-  if (name.includes('frozen')) return 90;
+  if (name.includes('frozen') || name.includes('ice cream')) return 90;
   
-  // Default based on category
+  // Snacks & supplements
+  if (name.includes('chips') || name.includes('chocolate')) return 120;
+  if (name.includes('protein')) return 365;
+  
+  // Default based on category with some items expiring soon
   switch (category?.toLowerCase()) {
+    case 'produce':
     case 'fresh produce':
     case 'fruits':
-    case 'vegetables': return 7;
-    case 'dairy': return 10;
-    case 'meat': return 3;
-    case 'bakery': return 5;
+    case 'vegetables': return Math.random() < 0.3 ? 3 : 7; // 30% expire in 3 days
+    case 'dairy': return Math.random() < 0.3 ? 4 : 10; // 30% expire in 4 days
+    case 'meat':
+    case 'seafood': return Math.random() < 0.5 ? 1 : 3; // 50% expire in 1 day
+    case 'bakery': return Math.random() < 0.4 ? 2 : 5; // 40% expire in 2 days
+    case 'beverages': return Math.random() < 0.2 ? 5 : 30; // 20% expire in 5 days
     case 'pantry':
-    case 'canned goods': return 365;
+    case 'canned goods':
+    case 'condiments':
+    case 'grains': return 365;
     case 'frozen': return 90;
+    case 'snacks':
+    case 'confectionery': return 120;
+    case 'supplements': return 365;
     default: return 30; // Default 1 month
   }
 };

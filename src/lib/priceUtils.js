@@ -114,7 +114,6 @@ export const getInventoryStatus = (inventory) => {
 };
 
 export const getPricingInfo = (product, userType) => {
-  console.log('Product info for pricing:', product);
   const updatedProduct = getAIUpdatedProduct(product);
   const regularPrice = updatedProduct.prices.regular;
   const discountedPrice = updatedProduct.prices.discounted;
@@ -149,8 +148,6 @@ export const hasDiscount = (product, userType) => {
 
 // AI Agent Simulation Functions
 export const getAIUpdatedProduct = (product) => {
-  console.log({product})
-  console.log('Checking AI updates for product:', aiUpdatedPrices);
   if (aiUpdatedPrices[product.id]) {
     return {
       ...product,
