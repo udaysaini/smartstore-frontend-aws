@@ -9,11 +9,13 @@ import { products, getFeaturedProducts } from '@/data/products';
 import { STORE_CONFIG } from '@/lib/constants';
 import { Suspense, useState } from 'react';
 import * as motion from 'motion/react-client';
+import AISimulationPanel from '@/components/AISimulationPanel';
 
 function ProductsContent() {
   const searchParams = useSearchParams();
   const filter = searchParams.get('filter'); // 'deals' or null for all products
   const [userKey, setUserKey] = useState(0); // Key to force re-render of product cards
+  const [priceUpdateKey, setPriceUpdateKey] = useState(0); // Key for AI price updates
   
   const displayProducts = filter === 'deals' ? getFeaturedProducts() : products;
   const pageTitle = filter === 'deals' ? 'All Deals & Flash Sales' : 'All Products';
@@ -23,6 +25,10 @@ function ProductsContent() {
 
   const handleUserChange = (user) => {
     setUserKey(prev => prev + 1); // Force re-render of all product cards
+  };
+
+  const handlePriceUpdate = () => {
+    setPriceUpdateKey(prev => prev + 1); // Force re-render for AI price updates
   };
 
   return (
@@ -87,7 +93,7 @@ function ProductsContent() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {displayProducts.map((product, index) => (
                   <motion.div
-                    key={`${product.id}-${userKey}`} // Include userKey to force re-render
+                    key={`${product.id}-${userKey}-${priceUpdateKey}`} // Include both keys for re-rendering
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: index * 0.05 }}
@@ -115,6 +121,9 @@ function ProductsContent() {
       </section>
 
       <FloatingCart />
+      
+      {/* AI Simulation Panel (Hidden - for demo) */}
+      <AISimulationPanel onPriceUpdate={handlePriceUpdate} />
     </div>
   );
 }

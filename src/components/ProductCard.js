@@ -26,9 +26,9 @@ export default function ProductCard({ product, className = "" }) {
     setUser(getCurrentUser());
   }, []);
 
-  // Use new pricing structure
+  // Use new pricing structure with AI updates
   const userType = user?.segment || 'Regular';
-  const { currentPrice, originalPrice, discount, showDiscount } = getPricingInfo(product, userType);
+  const { currentPrice, originalPrice, discount, showDiscount, isAIUpdated, aiReason } = getPricingInfo(product, userType);
   const badges = getBadges(product);
   const inventoryStatus = getInventoryStatus(product.inventory);
 
@@ -110,6 +110,18 @@ export default function ProductCard({ product, className = "" }) {
               </motion.div>
             </motion.div>
 
+            {/* AI Updated Badge */}
+            {isAIUpdated && (
+              <motion.div
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.5, type: "spring", stiffness: 500 }}
+                className="absolute top-2 right-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg"
+              >
+                🤖 AI Updated
+              </motion.div>
+            )}
+
             {/* Price animation overlay */}
             {discount > 0 && (
               <motion.div
@@ -155,14 +167,34 @@ export default function ProductCard({ product, className = "" }) {
               </motion.span>
             </div>
 
+            {/* AI Pricing Info */}
+            {isAIUpdated && (
+              <motion.div 
+                className="mb-3 p-2 bg-gradient-to-r from-blue-50 to-purple-50 rounded-md border border-blue-200"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                transition={{ delay: 0.3 }}
+              >
+                <div className="flex items-center gap-1 mb-1">
+                  <span className="text-xs font-medium text-blue-700">🤖 AI Price Update</span>
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                    className="w-3 h-3 border border-blue-500 border-t-transparent rounded-full"
+                  />
+                </div>
+                <p className="text-xs text-blue-600">{aiReason}</p>
+              </motion.div>
+            )}
+
             {/* Pricing with number animation */}
             <div className="flex items-center gap-2 mb-3">
               <motion.span 
                 className="text-lg font-bold text-gray-900"
-                key={currentPrice}
-                initial={{ scale: 1.2, color: '#22c55e' }}
+                key={`${currentPrice}-${isAIUpdated}`}
+                initial={{ scale: isAIUpdated ? 1.3 : 1.2, color: isAIUpdated ? '#3b82f6' : '#22c55e' }}
                 animate={{ scale: 1, color: '#111827' }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: isAIUpdated ? 0.8 : 0.3 }}
               >
                 {formatPrice(currentPrice)}
               </motion.span>
@@ -192,9 +224,13 @@ export default function ProductCard({ product, className = "" }) {
                 transition={{ delay: 0.3 }}
               >
                 {user.segment === 'VIP' ? (
-                  <span className="text-yellow-600 font-medium">⭐ Your VIP price</span>
+                  <span className="text-yellow-600 font-medium">
+                    ⭐ Your VIP price {isAIUpdated ? '(AI Enhanced!)' : ''}
+                  </span>
                 ) : (
-                  <span className="text-blue-600">Your member price</span>
+                  <span className="text-blue-600">
+                    Your member price {isAIUpdated ? '(AI Updated!)' : ''}
+                  </span>
                 )}
               </motion.div>
             ) : (

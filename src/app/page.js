@@ -4,6 +4,7 @@ import Header from '@/components/layout/Header';
 import ProductCard from '@/components/ProductCard';
 import CategoryCard from '@/components/CategoryCard';
 import FloatingCart from '@/components/FloatingCart';
+import AISimulationPanel from '@/components/AISimulationPanel';
 import { Button } from '@/components/ui/button';
 import { products, getFeaturedProducts } from '@/data/products';
 import { getFeaturedCategories } from '@/data/categories';
@@ -13,6 +14,7 @@ import * as motion from 'motion/react-client';
 
 export default function HomePage() {
   const [userKey, setUserKey] = useState(0); // Key to force re-render of product cards
+  const [priceUpdateKey, setPriceUpdateKey] = useState(0); // Key for AI price updates
   
   const featuredProducts = getFeaturedProducts().slice(0, 4); // Only show 4 deals (1 row)
   const featuredCategories = getFeaturedCategories();
@@ -20,6 +22,10 @@ export default function HomePage() {
 
   const handleUserChange = (user) => {
     setUserKey(prev => prev + 1); // Force re-render of all product cards
+  };
+
+  const handlePriceUpdate = () => {
+    setPriceUpdateKey(prev => prev + 1); // Force re-render for AI price updates
   };
 
   return (
@@ -153,7 +159,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {featuredProducts.map((product, index) => (
               <motion.div
-                key={`${product.id}-${userKey}`} // Include userKey to force re-render
+                key={`${product.id}-${userKey}-${priceUpdateKey}`} // Include both keys for re-rendering
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
@@ -231,7 +237,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {allProductsPreview.map((product, index) => (
               <motion.div
-                key={`${product.id}-${userKey}`} // Include userKey to force re-render
+                key={`${product.id}-${userKey}-${priceUpdateKey}`} // Include both keys for re-rendering
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: (index % 4) * 0.1 }}
@@ -271,6 +277,9 @@ export default function HomePage() {
 
       {/* Floating Cart */}
       <FloatingCart />
+
+      {/* AI Simulation Panel (Hidden - for demo) */}
+      <AISimulationPanel onPriceUpdate={handlePriceUpdate} />
     </div>
   );
 }
