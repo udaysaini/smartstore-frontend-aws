@@ -16,9 +16,9 @@ export const AI_CONFIG = {
   INVENTORY_DISCOUNT: 15,  // 15% discount for overstocked items
   VIP_PREMIUM_DISCOUNT: 25, // 25% additional VIP discount on premium items
   OVERSTOCK_THRESHOLD: 30,   // Items with more than 30 units considered overstocked
-  RETAIL_ADJUSTMENT_DURATION: 8000, // Duration for retail price adjustment simulation (8 seconds)
+  RETAIL_ADJUSTMENT_DURATION: 40000, // Duration for retail price adjustment simulation (40 seconds)
   RETAIL_DISCOUNT_RANGE: { min: 5, max: 20 }, // Discount range for retail adjustments
-  CLEARANCE_DURATION: 6000, // Duration for clearance simulation (6 seconds)
+  CLEARANCE_DURATION: 40000, // Duration for clearance simulation (40 seconds)
   CLEARANCE_DISCOUNT_RANGE: { min: 30, max: 70 } // Higher discounts for clearance
 };
 

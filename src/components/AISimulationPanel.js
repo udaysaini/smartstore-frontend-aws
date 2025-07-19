@@ -421,7 +421,7 @@ export default function AISimulationPanel({ onPriceUpdate, onNotification }) {
                 </button>
                 <span className="text-sm font-medium w-12 text-center">{retailDuration/1000}s</span>
                 <button 
-                  onClick={() => setRetailDuration(Math.min(15000, retailDuration + 1000))}
+                  onClick={() => setRetailDuration(Math.min(60000, retailDuration + 1000))}
                   className="w-6 h-6 bg-gray-100 rounded text-sm hover:bg-gray-200"
                 >
                   +
@@ -441,7 +441,7 @@ export default function AISimulationPanel({ onPriceUpdate, onNotification }) {
                 </button>
                 <span className="text-sm font-medium w-12 text-center">{clearanceDuration/1000}s</span>
                 <button 
-                  onClick={() => setClearanceDuration(Math.min(12000, clearanceDuration + 1000))}
+                  onClick={() => setClearanceDuration(Math.min(60000, clearanceDuration + 1000))}
                   className="w-6 h-6 bg-gray-100 rounded text-sm hover:bg-gray-200"
                 >
                   +
